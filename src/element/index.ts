@@ -17,7 +17,7 @@ import isNull from '@f/is-null'
  * ])
  */
 
-export function create (type, attributes, ...children) {
+export function create (type, attributes, ...children):any {
   if (!type) throw new TypeError('element() needs a type.')
   attributes = attributes || {}
   children = reduceArray(reduceChildren, [], children || [])

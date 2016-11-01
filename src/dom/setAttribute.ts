@@ -28,7 +28,7 @@ export function removeAttribute (DOMElement, name, previousValue) {
   }
 }
 
-export function setAttribute (DOMElement, name, value, previousValue) {
+export function setAttribute (DOMElement, name, value, previousValue?) {
   let eventType = events[name]
   if (value === previousValue) {
     return

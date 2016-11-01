@@ -64,7 +64,7 @@ function createThunk (vnode, path, dispatch, context) {
 
 function createHTMLElement (vnode, path, dispatch, context) {
   let { tagName, attributes, children } = vnode
-  let DOMElement = getCachedElement(tagName)
+  let DOMElement: any = getCachedElement(tagName)
 
   for (let name in attributes) {
     setAttribute(DOMElement, name, attributes[name])

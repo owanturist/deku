@@ -3,13 +3,14 @@ import {diffNode} from '../diff'
 import empty from '@f/empty-element'
 import noop from '@f/noop'
 
+
 /**
  * Create a DOM renderer using a container element. Everything will be rendered
  * inside of that container. Returns a function that accepts new state that can
  * replace what is currently rendered.
  */
 
-export function createApp (container, handler = noop, options = {}) {
+export function createApp (container, handler = noop, options: any = {}) {
   let oldVnode = null
   let node = null
   let rootId = options.id || '0'

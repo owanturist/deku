@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
     entry: [
-        path.join(__dirname, 'srcts', 'index.ts')
+        path.join(__dirname, 'src', 'index.ts')
     ],
     devtool: 'source-map',
     output: {
@@ -19,7 +19,7 @@ module.exports = {
         ]
     },
     resolve: {
-        root: path.join(__dirname, 'srcts'),
+        root: path.join(__dirname, 'src'),
         extensions: ['', '.js', '.ts', '.jsx', '.tsx']
     }
 };

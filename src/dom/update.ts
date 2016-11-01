@@ -102,7 +102,7 @@ function updateThunk (DOMElement, prev, next, path, dispatch, context) {
  * Recursively remove all thunks
  */
 
-function removeThunks (vnode, dispatch) {
+function removeThunks (vnode, dispatch?) {
   while (isThunk(vnode)) {
     let onRemove = vnode.options.onRemove
     let { model } = vnode.state
