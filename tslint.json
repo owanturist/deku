@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "tslint:recommended"
+  ],
+  "rules": {
+    "quotemark": [
+      true,
+      "single"
+    ],
+    "interface-name": [
+      true,
+      "never-prefix"
+    ],
+    "no-namespace": "allow-decalarations",
+    "object-literal-sort-keys": false,
+    "trailing-comma": {
+      "singleline": "never",
+      "multiline": "never"
+    },
+    "no-string-literal": false,
+    "no-var-requires": false,
+    "no-unused-variable": [
+      true,
+      {
+        "ignore-pattern": "^(deku)$"
+      }
+    ]
+  }
+}

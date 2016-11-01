@@ -24,9 +24,12 @@
     "version": "npm run build",
     "postversion": "git push && git push --tags && npm run clean",
     "standalone": "browserify src/index.js -s deku -t babelify -o dist/deku.js",
-    "example:basic": "budo examples/basic/index.js -- -t babelify"
+    "example:basic": "budo examples/basic/index.js -- -t babelify",
+    "test:ts": "rm -rf .tmp && webpack --config ./webpack.config.test.js && tape .tmp/bundle.js"
   },
   "devDependencies": {
+    "@types/tape": "^4.2.28",
+    "awesome-typescript-loader": "^2.2.4",
     "babel-cli": "6.3.17",
     "babel-plugin-check-es2015-constants": "^6.7.2",
     "babel-plugin-transform-es2015-arrow-functions": "^6.5.2",
@@ -68,6 +71,8 @@
     "tape": "4.2.2",
     "tape-run": "2.1.0",
     "trigger-event": "1.0.0",
+    "typescript": "^2.0.6",
+    "webpack": "^1.13.3",
     "zuul": "3.9.0"
   },
   "dependencies": {
