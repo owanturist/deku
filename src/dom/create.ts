@@ -13,7 +13,7 @@ const cache = {}
  * so they are treated like any other native element.
  */
 
-export function createElement (vnode, path, dispatch, context) {
+export function createElement (vnode, path?, dispatch?, context?) {
   switch (vnode.type) {
     case 'text':
       return createTextNode(vnode.nodeValue)

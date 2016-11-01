@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
     entry: [
-        path.join(__dirname, 'testts', 'index.ts')
+        path.join(__dirname, 'test', 'index.ts')
     ],
     output: {
         path: path.join(__dirname, '.tmp'),
@@ -18,7 +18,7 @@ module.exports = {
         ]
     },
     resolve: {
-        root: path.join(__dirname, 'testts'),
+        root: path.join(__dirname, 'test'),
         extensions: ['', '.js', '.ts', '.jsx', '.tsx']
     },
     node: {

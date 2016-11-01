@@ -10,7 +10,7 @@ import noop from '@f/noop'
  * replace what is currently rendered.
  */
 
-export function createApp (container, handler = noop, options: any = {}) {
+export function createApp (container?, handler = noop, options: any = {}) {
   let oldVnode = null
   let node = null
   let rootId = options.id || '0'
@@ -34,7 +34,7 @@ export function createApp (container, handler = noop, options: any = {}) {
     return node
   }
 
-  return (vnode, context = {}) => {
+  return (vnode?, context = {}) => {
     return node !== null
       ? update(vnode, context)
       : create(vnode, context)

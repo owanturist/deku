@@ -16,3 +16,5 @@ declare module '@f/foreach';
 declare module 'index-of';
 declare module 'setify';
 declare module 'dift';
+declare module 'is-dom';
+declare module 'trigger-event';

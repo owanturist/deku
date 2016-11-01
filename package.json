@@ -6,11 +6,15 @@
   "description": "Render interfaces using pure functions and virtual DOM",
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "rm -rf .tmp && webpack --config ./webpack.config.test.js && ./node_modules/.bin/tape .tmp/bundle.js"
+  },
   "devDependencies": {
     "@types/tape": "^4.2.28",
     "awesome-typescript-loader": "^2.2.4",
+    "is-dom": "^1.0.5",
     "tape": "4.2.2",
+    "trigger-event": "^1.0.3",
     "typescript": "^2.0.6",
     "webpack": "^1.13.3"
   },

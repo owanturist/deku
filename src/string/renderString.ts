@@ -22,7 +22,7 @@ function attributesToString (attributes) {
  * object that will be given to all components.
  */
 
-export function renderString (vnode, context, path = '0') {
+export function renderString (vnode, context?, path = '0') {
   switch (vnode.type) {
     case 'text':
       return renderTextNode(vnode)

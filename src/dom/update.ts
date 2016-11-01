@@ -11,7 +11,7 @@ import noop from '@f/noop'
  * Modify a DOM element given an array of actions.
  */
 
-export function updateElement (dispatch, context) {
+export function updateElement (dispatch?, context?) {
   return (DOMElement, action) => {
     Actions.case({
       sameNode: noop,

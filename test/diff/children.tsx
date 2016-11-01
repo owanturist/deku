@@ -1,10 +1,10 @@
-/** @jsx h */
-import test from 'tape'
-import {diffChildren, Actions} from '../../src/diff'
-import {create as h, createTextElement, createEmptyElement} from '../../src/element'
+import * as test from 'tape';
+import * as deku from '../../src';
+import {diffChildren, Actions} from '../../src/diff';
+import {create as h, createTextElement, createEmptyElement} from '../../src/element';
 
 test('diffChildren', t => {
-  let {insertChild, removeChild, updateChild, setAttribute, updateChildren, replaceNode} = Actions
+  let {insertChild, removeChild, updateChild, setAttribute, updateChildren, replaceNode} = Actions;
 
   t.deepEqual(
     diffChildren(<div/>, <div>hello</div>),
@@ -12,7 +12,7 @@ test('diffChildren', t => {
       insertChild(createTextElement('hello'), 0, '.0')
     ]),
     'insert text'
-  )
+  );
 
   t.deepEqual(
     diffChildren(<div>Hello</div>, <div>Goodbye</div>),
@@ -22,7 +22,7 @@ test('diffChildren', t => {
       ])
     ]),
     'update text'
-  )
+  );
 
   t.deepEqual(
     diffChildren(<div></div>, <div><span /></div>),
@@ -30,7 +30,7 @@ test('diffChildren', t => {
       insertChild(<span />, 0, '.0')
     ]),
     'insert element'
-  )
+  );
 
   t.deepEqual(
     diffChildren(<div><span /></div>, <div/>),
@@ -38,7 +38,7 @@ test('diffChildren', t => {
       removeChild(0)
     ]),
     'remove element'
-  )
+  );
 
   t.deepEqual(
     diffChildren(<div><span /></div>, <div>{null}</div>),
@@ -48,13 +48,13 @@ test('diffChildren', t => {
       ])
     ]),
     'remove element with null'
-  )
+  );
 
   t.deepEqual(
     diffChildren(<div>{null}</div>, <div>{null}</div>),
     updateChildren([]),
     'updated element with null'
-  )
+  );
 
   t.deepEqual(
     diffChildren(<div>{null}</div>, <div><span /></div>),
@@ -64,7 +64,7 @@ test('diffChildren', t => {
       ])
     ]),
     'add element from null'
-  )
+  );
 
-  t.end()
-})
+  t.end();
+});
