@@ -1,5 +1,5 @@
-import isValidAttribute from '@f/is-valid-attr'
-import isNull from '@f/is-null'
+import { isValidAttributeValue } from 'utils/is-valid-attribute-value';
+import { isNull } from 'utils/is-null';
 
 /**
  * Turn an object of key/value pairs into a HTML attribute string. This
@@ -7,14 +7,14 @@ import isNull from '@f/is-null'
  * should handle any other special cases specific to deku.
  */
 
-function attributesToString (attributes) {
-  var str = ''
-  for (var name in attributes) {
-    let value = attributes[name]
-    if (name === 'innerHTML') continue
-    if (isValidAttribute(value)) str += (' ' + name + '="' + attributes[name] + '"')
-  }
-  return str
+function attributesToString(attributes) {
+    let str = '';
+    for (let name in attributes) {
+        let value = attributes[name];
+        if (name === 'innerHTML') continue;
+        if (isValidAttributeValue(value)) str += (' ' + name + '="' + attributes[name] + '"');
+    }
+    return str;
 }
 
 /**
@@ -22,44 +22,44 @@ function attributesToString (attributes) {
  * object that will be given to all components.
  */
 
-export function renderString (vnode, context?, path = '0') {
-  switch (vnode.type) {
-    case 'text':
-      return renderTextNode(vnode)
-    case 'empty':
-      return renderEmptyNode()
-    case 'thunk':
-      return renderThunk(vnode, path, context)
-    case 'native':
-      return renderHTML(vnode, path, context)
-  }
+export function renderString(vnode, context?, path = '0') {
+    switch (vnode.type) {
+        case 'text':
+            return renderTextNode(vnode);
+        case 'empty':
+            return renderEmptyNode();
+        case 'thunk':
+            return renderThunk(vnode, path, context);
+        case 'native':
+            return renderHTML(vnode, path, context);
+    }
 }
 
-function renderTextNode (vnode) {
-  return vnode.nodeValue
+function renderTextNode(vnode) {
+    return vnode.nodeValue;
 }
 
-function renderEmptyNode () {
-  return '<noscript></noscript>'
+function renderEmptyNode() {
+    return '<noscript></noscript>';
 }
 
-function renderThunk (vnode, path, context) {
-  let { props, children } = vnode
-  let output = vnode.fn({ children, props, path, context })
-  return renderString(output, context, path)
+function renderThunk(vnode, path, context) {
+    let { props, children } = vnode;
+    let output = vnode.fn({ children, props, path, context });
+    return renderString(output, context, path);
 }
 
-function renderHTML (vnode, path, context) {
-  let {attributes, tagName, children} = vnode
-  let innerHTML = attributes.innerHTML
-  let str = '<' + tagName + attributesToString(attributes) + '>'
+function renderHTML(vnode, path, context) {
+    let {attributes, tagName, children} = vnode;
+    let innerHTML = attributes.innerHTML;
+    let str = '<' + tagName + attributesToString(attributes) + '>';
 
-  if (innerHTML) {
-    str += innerHTML
-  } else {
-    str += children.map((child, i) => renderString(child, context, path + '.' + (isNull(child.key) ? i : child.key))).join('')
-  }
+    if (innerHTML) {
+        str += innerHTML;
+    } else {
+        str += children.map((child, i) => renderString(child, context, path + '.' + (isNull(child.key) ? i : child.key))).join('');
+    }
 
-  str += '</' + tagName + '>'
-  return str
+    str += '</' + tagName + '>';
+    return str;
 }

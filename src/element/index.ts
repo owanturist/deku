@@ -1,8 +1,8 @@
-import isUndefined from '@f/is-undefined'
-import reduceArray from '@f/reduce-array'
-import isString from '@f/is-string'
-import isNumber from '@f/is-number'
-import isNull from '@f/is-null'
+import { isUndefined } from 'utils/is-undefined';
+import { reduceArray } from 'utils/reduce-array';
+import { isString } from 'utils/is-string';
+import { isNumber } from 'utils/is-number';
+import { isNull } from 'utils/is-null';
 
 /**
  * This function lets us create virtual nodes using a simple
@@ -17,32 +17,31 @@ import isNull from '@f/is-null'
  * ])
  */
 
-export function create (type, attributes, ...children):any {
-  if (!type) throw new TypeError('element() needs a type.')
-  attributes = attributes || {}
-  children = reduceArray(reduceChildren, [], children || [])
+export function create(type, attributes, ...children): any {
+    attributes = attributes || {};
+    children = reduceArray(reduceChildren, [], children || []);
 
-  let key = isString(attributes.key) || isNumber(attributes.key)
-    ? attributes.key
-    : null
+    let key = isString(attributes.key) || isNumber(attributes.key)
+        ? attributes.key
+        : null;
 
-  delete attributes.key
+    delete attributes.key;
 
-  if (typeof type === 'object') {
-    return createThunkElement(type.render, key, attributes, children, type)
-  }
+    if (typeof type === 'object') {
+        return createThunkElement(type.render, key, attributes, children, type);
+    }
 
-  if (typeof type === 'function') {
-    return createThunkElement(type, key, attributes, children, type)
-  }
+    if (typeof type === 'function') {
+        return createThunkElement(type, key, attributes, children, type);
+    }
 
-  return {
-    type: 'native',
-    tagName: type,
-    attributes,
-    children,
-    key
-  }
+    return {
+        type: 'native',
+        tagName: type,
+        attributes,
+        children,
+        key
+    };
 }
 
 /**
@@ -52,55 +51,55 @@ export function create (type, attributes, ...children):any {
  * - Filters out undefined elements
  */
 
-function reduceChildren (children, vnode) {
-  if (isString(vnode) || isNumber(vnode)) {
-    children.push(createTextElement(vnode))
-  } else if (isNull(vnode)) {
-    children.push(createEmptyElement())
-  } else if (Array.isArray(vnode)) {
-    children = [...children, ...(vnode.reduce(reduceChildren, []))]
-  } else if (isUndefined(vnode)) {
-    throw new Error(`vnode can't be undefined. Did you mean to use null?`)
-  } else {
-    children.push(vnode)
-  }
-  return children
+function reduceChildren(children, vnode) {
+    if (isString(vnode) || isNumber(vnode)) {
+        children.push(createTextElement(vnode));
+    } else if (isNull(vnode)) {
+        children.push(createEmptyElement());
+    } else if (Array.isArray(vnode)) {
+        children = [...children, ...(vnode.reduce(reduceChildren, []))];
+    } else if (isUndefined(vnode)) {
+        throw new Error(`vnode can't be undefined. Did you mean to use null?`);
+    } else {
+        children.push(vnode);
+    }
+    return children;
 }
 
 /**
  * Text nodes are stored as objects to keep things simple
  */
 
-export function createTextElement (text) {
-  return {
-    type: 'text',
-    nodeValue: text
-  }
+export function createTextElement(text) {
+    return {
+        type: 'text',
+        nodeValue: text
+    };
 }
 
 /**
  * Text nodes are stored as objects to keep things simple
  */
 
-export function createEmptyElement () {
-  return {
-    type: 'empty'
-  }
+export function createEmptyElement() {
+    return {
+        type: 'empty'
+    };
 }
 
 /**
  * Lazily-rendered virtual nodes
  */
 
-export function createThunkElement (fn, key, props, children, options) {
-  return {
-    type: 'thunk',
-    fn,
-    children,
-    props,
-    options,
-    key
-  }
+export function createThunkElement(fn, key, props, children, options) {
+    return {
+        type: 'thunk',
+        fn,
+        children,
+        props,
+        options,
+        key
+    };
 }
 
 /**
@@ -108,49 +107,49 @@ export function createThunkElement (fn, key, props, children, options) {
  */
 
 export let isThunk = (node) => {
-  return node.type === 'thunk'
-}
+    return node.type === 'thunk';
+};
 
 export let isText = (node) => {
-  return node.type === 'text'
-}
+    return node.type === 'text';
+};
 
 export let isEmpty = (node) => {
-  return node.type === 'empty'
-}
+    return node.type === 'empty';
+};
 
 export let isNative = (node) => {
-  return node.type === 'native'
-}
+    return node.type === 'native';
+};
 
 export let isSameThunk = (left, right) => {
-  return isThunk(left) && isThunk(right) && left.fn === right.fn
-}
+    return isThunk(left) && isThunk(right) && left.fn === right.fn;
+};
 
 /**
  * Group an array of virtual elements by their key, using index as a fallback.
  */
 
 export let groupByKey = (children) => {
-  let iterator = (acc, child, i) => {
-    if (!isUndefined(child) && child !== false) {
-      let key = isNull(child) ? i : (child.key || i)
-      acc.push({
-        key: String(key),
-        item: child,
-        index: i
-      })
-    }
-    return acc
-  }
+    let iterator = (acc, child, i) => {
+        if (!isUndefined(child) && child !== false) {
+            let key = isNull(child) ? i : (child.key || i);
+            acc.push({
+                key: String(key),
+                item: child,
+                index: i
+            });
+        }
+        return acc;
+    };
 
-  return reduceArray(iterator, [], children)
-}
+    return reduceArray(iterator, [], children);
+};
 
 /**
  * Create a node path, eg. (23,5,2,4) => '23.5.2.4'
  */
 
 export let createPath = (...args) => {
-  return args.join('.')
-}
+    return args.join('.');
+};

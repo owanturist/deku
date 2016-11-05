@@ -1,6 +1,6 @@
-import {renderString} from './renderString'
+import {renderString} from './renderString';
 
-const render = renderString
+const render = renderString;
 
 export {
   render

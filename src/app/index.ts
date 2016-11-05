@@ -1,7 +1,8 @@
-import * as dom from '../dom'
-import {diffNode} from '../diff'
-import empty from '@f/empty-element'
-import noop from '@f/noop'
+import { createElement, updateElement } from '../dom';
+import { diffNode } from '../diff';
+import { clearElement } from 'utils/clear-element';
+import { noop } from 'utils/noop';
+import { isNull } from 'utils/is-null';
 
 
 /**
@@ -9,34 +10,29 @@ import noop from '@f/noop'
  * inside of that container. Returns a function that accepts new state that can
  * replace what is currently rendered.
  */
+export function createApp(container: HTMLElement, dispatch = noop, rootId: string = '0') {
+    let oldVnode = null;
+    let node = null;
 
-export function createApp (container?, handler = noop, options: any = {}) {
-  let oldVnode = null
-  let node = null
-  let rootId = options.id || '0'
-  let dispatch = effect => effect && handler(effect)
+    clearElement(container);
 
-  if (container) {
-    empty(container)
-  }
+    let update = (newVnode, context) => {
+        let changes = diffNode(oldVnode, newVnode, rootId);
+        node = changes.reduce(updateElement(dispatch, context), node);
+        oldVnode = newVnode;
+        return node;
+    };
 
-  let update = (newVnode, context) => {
-    let changes = diffNode(oldVnode, newVnode, rootId)
-    node = changes.reduce(dom.updateElement(dispatch, context), node)
-    oldVnode = newVnode
-    return node
-  }
+    let create = (vnode, context) => {
+        node = createElement(vnode, rootId, dispatch, context);
+        container.appendChild(node);
+        oldVnode = vnode;
+        return node;
+    };
 
-  let create = (vnode, context) => {
-    node = dom.createElement(vnode, rootId, dispatch, context)
-    if (container) container.appendChild(node)
-    oldVnode = vnode
-    return node
-  }
-
-  return (vnode?, context = {}) => {
-    return node !== null
-      ? update(vnode, context)
-      : create(vnode, context)
-  }
+    return (vnode?, context = {}) => {
+        return isNull(node)
+            ? update(vnode, context)
+            : create(vnode, context);
+    };
 }

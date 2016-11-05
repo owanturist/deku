@@ -18,7 +18,7 @@ module.exports = {
         ]
     },
     resolve: {
-        root: path.join(__dirname, 'test'),
+        root: path.join(__dirname, 'src'),
         extensions: ['', '.js', '.ts', '.jsx', '.tsx']
     },
     node: {
