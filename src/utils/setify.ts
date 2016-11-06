@@ -14,11 +14,15 @@ function isSupportedTypes(type: string): boolean {
 }
 
 export function setify(element: HTMLElement, value: string): void {
-    if (element instanceof HTMLInputElement && isSupportedTypes(element.type)) {
-        const start = element.selectionStart;
-        const end = element.selectionEnd;
+    if (element instanceof HTMLInputElement) {
+        if (isSupportedTypes(element.type)) {
+            const start = element.selectionStart;
+            const end = element.selectionEnd;
 
-        element.value = value;
-        element.setSelectionRange(start, end);
+            element.value = value;
+            element.setSelectionRange(start, end);
+        } else {
+            element.value = value;
+        }
     }
 }
