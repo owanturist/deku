@@ -1,12 +1,10 @@
-const path = require('path')
+const path = require('path');
 
 module.exports = {
-    entry: [
-        path.join(__dirname, 'test', 'index.ts')
-    ],
+    entry: path.join(__dirname, 'entry-spec'),
     output: {
-        path: path.join(__dirname, '.tmp'),
-        filename: 'bundle.js'
+        path: path.join(__dirname, 'dist'),
+        filename: 'spec.js'
     },
     module: {
         loaders: [

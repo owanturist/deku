@@ -1,9 +1,7 @@
-const path = require('path')
+const path = require('path');
 
 module.exports = {
-    entry: [
-        path.join(__dirname, 'src', 'index.ts')
-    ],
+    entry: path.join(__dirname, 'src', 'index.ts'),
     devtool: 'source-map',
     output: {
         path: path.join(__dirname, 'dist'),

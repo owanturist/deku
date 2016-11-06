@@ -1,20 +1,13 @@
 import * as diff from './diff';
-import * as vnode from './element';
+import { create as createElement } from './element';
 import * as string from './string';
 import * as dom from './dom';
 import { createApp } from './app';
 
-const element = vnode.create;
-const h = vnode.create;
-const createElement = vnode.create;
-
 export {
     createElement,
     createApp,
-    element,
     string,
-    vnode,
     diff,
-    dom,
-    h
+    dom
 }

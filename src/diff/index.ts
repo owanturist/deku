@@ -2,7 +2,7 @@ import { isText, isThunk, isSameThunk, isNative, isEmpty, groupByKey, createPath
 import dift, { CREATE, UPDATE, MOVE, REMOVE } from 'dift';
 import { isUndefined } from 'utils/is-undefined';
 import { isNull } from 'utils/is-null';
-import Type from 'union-type';
+import * as Type from 'union-type';
 let Any = () => true;
 let Path = () => String;
 
