@@ -14,11 +14,17 @@ module.exports = {
                 loader: 'awesome-typescript',
                 exclude: /node_modules/
             }
-        ]
+        ],
+        noParse: [
+            /node_modules\/sinon/,
+        ],
     },
     resolve: {
         root: path.join(__dirname, 'src'),
-        extensions: ['', '.js', '.ts', '.jsx', '.tsx']
+        extensions: ['', '.js', '.ts', '.jsx', '.tsx'],
+        alias: {
+            sinon: 'sinon/pkg/sinon'
+        }
     },
     node: {
         fs: 'empty'

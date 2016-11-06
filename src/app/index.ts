@@ -32,7 +32,7 @@ export function createApp(container: HTMLElement, dispatch = noop, rootId: strin
 
     return (vnode?, context = {}) => {
         return isNull(node)
-            ? update(vnode, context)
-            : create(vnode, context);
+            ? create(vnode, context)
+            : update(vnode, context);
     };
 }

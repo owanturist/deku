@@ -15,11 +15,13 @@
   "devDependencies": {
     "@types/chai": "^3.4.34",
     "@types/mocha": "^2.2.32",
+    "@types/sinon": "^1.16.31",
     "@types/tape": "^4.2.28",
     "awesome-typescript-loader": "^2.2.4",
     "chai": "^3.5.0",
     "is-dom": "^1.0.5",
     "mocha": "^3.1.2",
+    "sinon": "^1.17.6",
     "tape": "4.2.2",
     "trigger-event": "^1.0.3",
     "typescript": "^2.0.6",
