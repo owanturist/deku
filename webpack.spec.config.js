@@ -2,6 +2,7 @@ const path = require('path');
 
 module.exports = {
     entry: path.join(__dirname, 'entry-spec'),
+    devtool: 'source-map',
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'spec.js'
