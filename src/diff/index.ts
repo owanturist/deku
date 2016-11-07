@@ -65,7 +65,7 @@ export function diffChildren(previous, next, parentPath?) {
 
     function effect(type, prev, next, pos) {
         let nextPath = next
-            ? createPath(parentPath, next.key == null ? next.index : next.key)
+            ? createPath([ parentPath, next.key == null ? next.index : next.key ])
             : null;
         switch (type) {
             case CREATE: {
@@ -99,6 +99,9 @@ export function diffChildren(previous, next, parentPath?) {
             }
             case REMOVE: {
                 changes.push(removeChild(prev.index));
+                break;
+            }
+            default: {
                 break;
             }
         }

@@ -54,7 +54,7 @@ function createThunk(vnode, path, dispatch, context) {
         context
     };
     let output = vnode.fn(model);
-    let childPath = createPath(path, output.key || '0');
+    let childPath = createPath([ path, output.key || '0' ]);
     let DOMElement = createElement(output, childPath, dispatch, context);
     if (onCreate) dispatch(onCreate(model));
     vnode.state = {
@@ -74,7 +74,7 @@ function createHTMLElement(vnode, path, dispatch, context) {
 
     children.forEach((node, index) => {
         if (isNil(node)) return;
-        let childPath = createPath(path, node.key || index);
+        let childPath = createPath([ path, node.key || index ]);
         let child = createElement(node, childPath, dispatch, context);
         DOMElement.appendChild(child);
     });
