@@ -3,7 +3,8 @@ import { assert } from 'chai';
 
 import {
     create as h,
-    groupByKey
+    groupByKey,
+    createPath
 } from 'element';
 
 describe('Element', () => {
@@ -37,5 +38,22 @@ describe('Element', () => {
         ];
 
         assert.deepEqual(actual, expented);
+    });
+});
+
+describe('Element createPath', () => {
+    it('returns empty string for empty array', () => {
+        assert.equal(createPath([]), '');
+    });
+
+    it('returns joined array\'s element', () => {
+        const parts = [
+            'foo',
+            'bar',
+            '1'
+        ];
+        const expented = 'foo.bar.1';
+
+        assert.equal(createPath(parts), expented);
     });
 });

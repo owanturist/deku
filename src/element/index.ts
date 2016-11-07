@@ -149,14 +149,6 @@ export let groupByKey = (children) => {
 /**
  * Create a node path, eg. (23,5,2,4) => '.23.5.2.4'
  */
-
 export function createPath(parts: string[]): string {
-    let result = '';
-    const { length } = parts;
-
-    for (let i = 0; i < length; i++) {
-        result += `.${parts[ i ]}`;
-    }
-
-    return result;
+    return parts.join('.');
 }
