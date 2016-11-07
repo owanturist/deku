@@ -1,47 +1,54 @@
-import { isUndefined } from 'utils/is-undefined';
 import { reduceArray } from 'utils/reduce-array';
-import { isString } from 'utils/is-string';
-import { isNumber } from 'utils/is-number';
+import { isUndefined } from 'utils/is-undefined';
 import { isNull } from 'utils/is-null';
 
 /**
  * This function lets us create virtual nodes using a simple
  * syntax. It is compatible with JSX transforms so you can use
  * JSX to write nodes that will compile to this function.
- *
- * let node = element('div', { id: 'foo' }, [
- *   element('a', { href: 'http://google.com' },
- *     element('span', {}, 'Google'),
- *     element('b', {}, 'Link')
- *   )
- * ])
  */
 
-export function create(type, attributes, ...children): any {
-    attributes = attributes || {};
-    children = reduceArray(reduceChildren, [], children || []);
+export function getKey(maybeKey: any): string | void {
+    switch (typeof maybeKey) {
+        case 'number': {
+            return (maybeKey as number).toString();
+        }
 
-    let key = isString(attributes.key) || isNumber(attributes.key)
-        ? attributes.key
-        : null;
+        case 'string': {
+            return maybeKey as string;
+        }
 
-    delete attributes.key;
+        default:
+            return undefined;
+    }
+}
 
-    if (typeof type === 'object') {
-        return createThunkElement(type.render, key, attributes, children, type);
+export function create(type, attributes?, ...children): any {
+    let key;
+
+    if (isNull(attributes)) {
+        attributes = {};
+    } else {
+        key = getKey(attributes.key);
+
+        delete attributes.key;
     }
 
-    if (typeof type === 'function') {
-        return createThunkElement(type, key, attributes, children, type);
-    }
+    children = reduceArray(reduceChildren, [], children);
 
-    return {
-        type: 'native',
-        tagName: type,
-        attributes,
-        children,
-        key
-    };
+    switch (typeof type) {
+        case 'object': {
+            return createThunkElement(type.render, key, attributes, children, type);
+        }
+
+        case 'function': {
+            return createThunkElement(type, key, attributes, children, type);
+        }
+
+        default: {
+            return createNativeElement(type, attributes, children, key);
+        }
+    }
 }
 
 /**
@@ -50,27 +57,64 @@ export function create(type, attributes, ...children): any {
  * - Converts raw strings and numbers into vnodes
  * - Filters out undefined elements
  */
-
 function reduceChildren(children, vnode) {
-    if (isString(vnode) || isNumber(vnode)) {
-        children.push(createTextElement(vnode));
-    } else if (isNull(vnode)) {
-        children.push(createEmptyElement());
-    } else if (Array.isArray(vnode)) {
-        children = [...children, ...(vnode.reduce(reduceChildren, []))];
-    } else if (isUndefined(vnode)) {
-        throw new Error(`vnode can't be undefined. Did you mean to use null?`);
-    } else {
-        children.push(vnode);
+    switch (typeof vnode) {
+        case 'undefined': {
+            throw new Error(`vnode can't be undefined. Did you mean to use null?`);
+        }
+
+        case 'string': {
+            children.push(
+                createTextElement(vnode as string)
+            );
+
+            return children;
+        }
+
+        case 'number': {
+            children.push(
+                createTextElement((vnode as number).toString())
+            );
+
+            return children;
+        }
+
+        case 'object': {
+            if (isNull(vnode)) {
+                children.push(createEmptyElement());
+
+                return children;
+            }
+
+            if (Array.isArray(vnode)) {
+                return reduceArray(reduceChildren, children, vnode);
+            }
+        }
+
+        default: {
+            children.push(vnode);
+
+            return children;
+        }
     }
-    return children;
+}
+
+
+export function createNativeElement(tagName, attributes, children, key) {
+    return {
+        type: 'native',
+        tagName,
+        attributes,
+        children,
+        key
+    };
 }
 
 /**
  * Text nodes are stored as objects to keep things simple
  */
 
-export function createTextElement(text) {
+export function createTextElement(text: string) {
     return {
         type: 'text',
         nodeValue: text
@@ -129,7 +173,6 @@ export let isSameThunk = (left, right) => {
 /**
  * Group an array of virtual elements by their key, using index as a fallback.
  */
-
 export let groupByKey = (children) => {
     let iterator = (acc, child, i) => {
         if (!isUndefined(child) && child !== false) {
@@ -147,7 +190,7 @@ export let groupByKey = (children) => {
 };
 
 /**
- * Create a node path, eg. (23,5,2,4) => '.23.5.2.4'
+ * Create a node path.
  */
 export function createPath(parts: string[]): string {
     return parts.join('.');
