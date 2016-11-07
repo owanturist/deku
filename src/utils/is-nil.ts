@@ -1,3 +1,3 @@
-export function isNil(value: any): value is void {
+export function isNil(value: any): boolean {
     return value == undefined;
 }
