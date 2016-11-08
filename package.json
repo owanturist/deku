@@ -8,42 +8,21 @@
   "jsnext:main": "es/index.js",
   "scripts": {
     "build": "./node_modules/.bin/webpack",
-    "test:clean": "rm dist/spec.js",
-    "test:build": "node_modules/.bin/webpack --config ./webpack.spec.config.js",
-    "test:run": "node_modules/.bin/mocha dist/spec.js"
+    "test": "node_modules/.bin/jest",
+    "test:watch": "node_modules/.bin/jest --watch",
+    "test:coverage": "node_modules/.bin/jest --coverage"
   },
   "devDependencies": {
     "@types/chai": "^3.4.34",
-    "@types/mocha": "^2.2.32",
-    "@types/sinon": "^1.16.31",
-    "@types/tape": "^4.2.28",
+    "@types/jest": "^15.1.32",
     "awesome-typescript-loader": "^2.2.4",
-    "chai": "^3.5.0",
-    "is-dom": "^1.0.5",
-    "mocha": "^3.1.2",
-    "sinon": "^1.17.6",
-    "tape": "4.2.2",
-    "trigger-event": "^1.0.3",
-    "typescript": "^2.0.6",
+    "jest": "^15.1.1",
+    "ts-jest": "^0.1.13",
+    "typescript": "^2.0.8",
     "webpack": "^1.13.3"
   },
   "dependencies": {
-    "@f/create-element": "1.0.0",
-    "@f/empty-element": "^1.0.0",
-    "@f/foreach": "1.2.2",
-    "@f/is-function": "1.1.1",
-    "@f/is-null": "1.0.0",
-    "@f/is-number": "1.1.1",
-    "@f/is-string": "1.1.1",
-    "@f/is-undefined": "1.1.1",
-    "@f/is-valid-attr": "1.0.0",
-    "@f/noop": "1.2.0",
-    "@f/reduce-array": "^0.2.1",
-    "@f/set-attribute": "1.0.1",
-    "@f/to-array": "1.1.1",
     "dift": "0.1.12",
-    "index-of": "0.2.0",
-    "setify": "1.0.3",
     "union-type": "0.1.6"
   },
   "keywords": [
@@ -54,5 +33,27 @@
     "dom",
     "elm",
     "redux"
-  ]
+  ],
+  "jest": {
+    "testRegex": "(/spec/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testPathDirs": [
+      "src/utils"
+    ],
+    "modulePaths": [
+      "src"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "tsx"
+    ],
+    "scriptPreprocessor": "<rootDir>/node_modules/ts-jest/preprocessor.js",
+    "testResultsProcessor": "<rootDir>/node_modules/ts-jest/coverageprocessor.js",
+    "coverageReporters": [
+      "json",
+      "html",
+      "text"
+    ],
+    "coverageDirectory": "<rootDir>/coverage"
+  }
 }

@@ -1,9 +1,9 @@
 node_modules
 .DS_Store
 _book
-.tmp
 .vscode
 dist
+coverage
 lib
 es
 npm-debug.log
