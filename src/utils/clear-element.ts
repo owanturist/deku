@@ -1,7 +1,5 @@
 export function clearElement(element: HTMLElement): void {
-    let node;
-
-    while (node = element.firstChild) {
-        element.removeChild(node);
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
     }
 }
