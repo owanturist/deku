@@ -4,7 +4,7 @@ import { isString } from 'utils/is-string';
 import { isNumber } from 'utils/is-number';
 import { createElement as createNativeElement } from 'utils/create-element';
 
-import { createPath } from '../element';
+import { createPath } from '../vnode';
 import { setAttribute } from './setAttribute';
 
 const cache = {};
@@ -15,7 +15,7 @@ const cache = {};
  * so they are treated like any other native element.
  */
 
-export function createElement(vnode, path?, dispatch?, context?) {
+export function createElement(vnode, path, dispatch?, context?) {
     switch (vnode.type) {
         case 'text':
             return createTextNode(vnode.nodeValue);

@@ -1,5 +1,5 @@
 import { setAttribute, removeAttribute } from './setAttribute';
-import { isThunk, createPath } from '../element';
+import { isThunk, createPath } from '../vnode';
 import { Actions, diffNode } from '../diff';
 import { reduceArray } from 'utils/reduce-array';
 import { createElement } from './create';

@@ -1,4 +1,4 @@
-import { isText, isThunk, isSameThunk, isNative, isEmpty, groupByKey, createPath } from '../element';
+import { isText, isThunk, isSameThunk, isNative, isEmpty, groupByKey, createPath } from '../vnode';
 import dift, { CREATE, UPDATE, MOVE, REMOVE } from 'dift';
 import { isUndefined } from 'utils/is-undefined';
 import { isNull } from 'utils/is-null';
@@ -29,7 +29,7 @@ export let Actions = Type({
  * changes to transform the old object into the new one.
  */
 
-export function diffAttributes(previous, next) {
+export function diffAttributes(previous/* native */, next/* native */) {
     let { setAttribute, removeAttribute } = Actions;
     let changes = [];
     let pAttrs = previous.attributes;
@@ -132,11 +132,12 @@ export function diffNode(prev, next, path?) {
     }
 
     // Remove
-    if (!isUndefined(prev) && isUndefined(next)) {
+    if (isUndefined(next)) {
         return [removeNode(prev)];
     }
 
     // Replace with empty
+    // isNull(prev) ^ isNull(next)
     if (!isNull(prev) && isNull(next) || isNull(prev) && !isNull(next)) {
         return [replaceNode(prev, next, path)];
     }

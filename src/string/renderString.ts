@@ -1,4 +1,4 @@
-import { createPath } from 'element';
+import { createPath } from 'vnode';
 
 /**
  * Turn an object of key/value pairs into a HTML attribute string. This

@@ -8,7 +8,7 @@ import {
 import {
     createTextElement,
     createEmptyElement
-} from 'element';
+} from 'vnode';
 
 describe('Diff children', () => {
     it('insert text', () => {

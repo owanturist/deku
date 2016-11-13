@@ -37,7 +37,7 @@
   "jest": {
     "testRegex": "(/spec/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "testPathDirs": [
-      "src/utils"
+      "src/vnode"
     ],
     "modulePaths": [
       "src"

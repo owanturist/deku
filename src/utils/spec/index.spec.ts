@@ -3,8 +3,7 @@ import {
     isNull,
     isUndefined,
 
-    forEach,
-    indexOf
+    forEach
 } from 'utils';
 
 
