@@ -1,4 +1,4 @@
-import deku from '../..';
+import deku from 'deku';
 
 describe('Element', () => {
     describe('NativeElement', () => {

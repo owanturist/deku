@@ -1,9 +1,7 @@
 import {
     isNil,
     isNull,
-    isUndefined,
-
-    forEach
+    isUndefined
 } from 'utils';
 
 
@@ -109,31 +107,5 @@ describe('isUndefined()', () => {
     it('object', () => {
         expect(isUndefined({})).toBeFalsy();
         expect(isUndefined({ foo: 'bar' })).toBeFalsy();
-    });
-});
-
-describe('forEach()', () => {
-    it('empty', () => {
-        const array = [];
-        const callbackfn = jest.fn();
-
-        forEach(callbackfn, array);
-
-        expect(callbackfn.mock.calls.length).toBe(0);
-    });
-
-    it('not empty', () => {
-        const array = [
-            'foo',
-            'bar'
-        ];
-        const callbackfn = jest.fn();
-
-        forEach(callbackfn, array);
-
-        expect(callbackfn.mock.calls).toEqual([
-            [ 'foo', 0, array ],
-            [ 'bar', 1, array ]
-        ]);
     });
 });

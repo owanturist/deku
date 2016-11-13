@@ -13,17 +13,15 @@
     "test:coverage": "node_modules/.bin/jest --coverage"
   },
   "devDependencies": {
-    "@types/chai": "^3.4.34",
     "@types/jest": "^15.1.32",
     "awesome-typescript-loader": "^2.2.4",
-    "jest": "^15.1.1",
-    "ts-jest": "^0.1.13",
+    "jest": "^17.0.0",
+    "ts-jest": "^17.0.0",
     "typescript": "^2.0.8",
     "webpack": "^1.13.3"
   },
   "dependencies": {
-    "dift": "0.1.12",
-    "union-type": "0.1.6"
+    "dift": "0.1.12"
   },
   "keywords": [
     "deku",
@@ -35,9 +33,9 @@
     "redux"
   ],
   "jest": {
-    "testRegex": "(/spec/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testRegex": "(/spec/.*|\\.(test|spec))\\.ts(|x)$",
     "testPathDirs": [
-      "src/vnode"
+      "src"
     ],
     "modulePaths": [
       "src"
@@ -47,13 +45,21 @@
       "ts",
       "tsx"
     ],
-    "scriptPreprocessor": "<rootDir>/node_modules/ts-jest/preprocessor.js",
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
     "testResultsProcessor": "<rootDir>/node_modules/ts-jest/coverageprocessor.js",
     "coverageReporters": [
       "json",
       "html",
       "text"
     ],
-    "coverageDirectory": "<rootDir>/coverage"
+    "coverageDirectory": "<rootDir>/coverage",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }
