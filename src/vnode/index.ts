@@ -5,7 +5,6 @@ import {
     isNull
 } from 'utils';
 
-
 export function create(
     type: string,
     attributes?: Deku.Attributes,
@@ -38,7 +37,7 @@ export function create(
         }
 
         default: {
-            throw new Error('Element type is invalid.');
+            throw new Error('Vnode type is invalid.');
         }
     }
 }
@@ -75,14 +74,14 @@ function createFromChild(child: Deku.Child): Deku.Vnode {
 
 function createNative(
     tagName: string,
-    props: Deku.Props,
+    attributes: Deku.Props,
     children: Deku.Vnode[],
     key?: Deku.Key
 ): Deku.NativeVnode {
     return {
         type: 'native',
         tagName,
-        props,
+        attributes,
         children,
         key
     };
@@ -117,4 +116,9 @@ function createEmpty(): Deku.EmptyVnode {
     return {
         type: 'empty'
     };
+}
+
+
+export function createPath(parts: (string | number)[]): string {
+    return parts.join('.');
 }

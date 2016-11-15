@@ -8,7 +8,7 @@ describe('Element', () => {
             ).toEqual({
                 type: 'native',
                 tagName: 'div',
-                props: {},
+                attributes: {},
                 children: [],
                 key: undefined
             });
@@ -20,7 +20,7 @@ describe('Element', () => {
             ).toEqual({
                 type: 'native',
                 tagName: 'div',
-                props: {},
+                attributes: {},
                 children: [],
                 key: 'key'
             });
@@ -32,7 +32,7 @@ describe('Element', () => {
             ).toEqual({
                 type: 'native',
                 tagName: 'div',
-                props: {
+                attributes: {
                     width: '300px',
                     height: '400px'
                 },
@@ -49,7 +49,7 @@ describe('Element', () => {
             ).toEqual({
                 type: 'native',
                 tagName: 'div',
-                props: {},
+                attributes: {},
                 children: [
                     {
                         type: 'text',
@@ -58,7 +58,7 @@ describe('Element', () => {
                     {
                         type: 'native',
                         tagName: 'span',
-                        props: {},
+                        attributes: {},
                         children: [],
                         key: undefined
                     },

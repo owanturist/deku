@@ -26,7 +26,7 @@ declare namespace Deku {
     interface NativeVnode {
         type: 'native';
         tagName: string;
-        props: Props;
+        attributes: Props;
         children: Vnode[];
         key?: Key;
     }

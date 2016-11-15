@@ -33,7 +33,7 @@
     "redux"
   ],
   "jest": {
-    "testRegex": "(/spec/.*|\\.(test|spec))\\.ts(|x)$",
+    "testRegex": "(/spec/.*|\\.spec)\\.ts(|x)$",
     "testPathDirs": [
       "src"
     ],
