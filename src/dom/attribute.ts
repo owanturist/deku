@@ -45,25 +45,25 @@ function isInputWithArea(type: string): boolean {
 export function set(
     DOMNode: Node,
     attribute: string,
-    value: any,
-    previousValue?: any
+    nextValue: any,
+    prevValue?: any
 ): void {
-    if (value === previousValue) {
+    if (nextValue === prevValue) {
         return;
     }
 
     const eventType = getEventByAttribute(attribute);
 
     if (isString(eventType)) {
-        if (isFunction(previousValue)) {
-            DOMNode.removeEventListener(eventType, previousValue);
+        if (isFunction(prevValue)) {
+            DOMNode.removeEventListener(eventType, prevValue);
         }
-        DOMNode.addEventListener(eventType, value);
+        DOMNode.addEventListener(eventType, nextValue);
         return;
     }
 
-    if (!isValidAttributeValue(value)) {
-        remove(DOMNode, attribute, previousValue);
+    if (!isValidAttributeValue(nextValue)) {
+        remove(DOMNode, attribute, prevValue);
         return;
     }
 
@@ -72,7 +72,7 @@ export function set(
         case 'disabled':
         case 'innerHTML':
         case 'nodeValue': {
-            DOMNode[ attribute ] = value;
+            DOMNode[ attribute ] = nextValue;
             break;
         }
 
@@ -81,7 +81,7 @@ export function set(
                 DOMNode instanceof HTMLOptionElement ||
                 DOMNode instanceof HTMLOptGroupElement
             ) {
-                DOMNode.selected = value;
+                DOMNode.selected = nextValue;
             }
             break;
         }
@@ -92,21 +92,20 @@ export function set(
                     const start = DOMNode.selectionStart;
                     const end = DOMNode.selectionEnd;
 
-                    DOMNode.value = value;
+                    DOMNode.value = nextValue;
                     DOMNode.setSelectionRange(start, end);
                 } else {
-                    DOMNode.value = value;
+                    DOMNode.value = nextValue;
                 }
             }
             break;
         }
 
-
         default: {
             if (DOMNode instanceof Element) {
-                DOMNode.setAttribute(attribute, value);
+                DOMNode.setAttribute(attribute, nextValue);
             } else if (DOMNode instanceof SVGElement) {
-                DOMNode.setAttributeNS(DOMNode.namespaceURI, attribute, value);
+                DOMNode.setAttributeNS(DOMNode.namespaceURI, attribute, nextValue);
             }
         }
     }
@@ -116,12 +115,12 @@ export function set(
 export function remove(
     DOMNode: Node,
     attribute: string,
-    previousValue?: any
+    prevValue?: any
 ): void {
     const eventType = getEventByAttribute(attribute);
 
-    if (isString(eventType) && isFunction(previousValue)) {
-        DOMNode.removeEventListener(eventType, previousValue);
+    if (isString(eventType) && isFunction(prevValue)) {
+        DOMNode.removeEventListener(eventType, prevValue);
         return;
     }
 

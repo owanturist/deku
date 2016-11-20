@@ -23,8 +23,7 @@ import {
     removeNode,
     updateChild,
     updateThunk,
-    insertBefore,
-    sameNode
+    insertBefore
 } from './actions';
 
 
@@ -44,9 +43,7 @@ export function diffVnodes(
     }
 
     if (prevVnode === nextVnode) {
-        return [
-            sameNode()
-        ];
+        return [];
     }
 
     const prevNullable = isNull(prevVnode);

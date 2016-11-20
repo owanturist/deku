@@ -99,9 +99,3 @@ export function updateThunk(
         payload: { prevVnode, nextVnode, path }
     };
 }
-
-export function sameNode(): Deku.DiffAction {
-    return {
-        type: 'SAME_NODE'
-    };
-}

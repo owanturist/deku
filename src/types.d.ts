@@ -56,71 +56,88 @@ declare namespace Deku {
     }
 
     type DiffAction
-        = {
-            type: 'SET_ATTRIBUTE';
-            payload: {
-                attribute: string;
-                prevValue: any;
-                nextValue: any;
-            };
+        = SetAttributeAction
+        | RemoveAttributeAction
+        | InsertChildAction
+        | RemoveChildAction
+        | UpdateChildAction
+        | UpdateChildrenAction
+        | InsertBeforeAction
+        | ReplaceNodeAction
+        | RemoveNodeAction
+        | UpdateThunkAction
+
+    type SetAttributeAction = {
+        type: 'SET_ATTRIBUTE';
+        payload: {
+            attribute: string;
+            prevValue: any;
+            nextValue: any;
+        };
+    }
+
+    type RemoveAttributeAction = {
+        type: 'REMOVE_ATTRIBUTE';
+        payload: {
+            attribute: string;
+            value: any;
         }
-        | {
-            type: 'REMOVE_ATTRIBUTE';
-            payload: {
-                attribute: string;
-                value: any;
-            }
+    }
+
+    type InsertChildAction = {
+        type: 'INSERT_CHILD';
+        payload: {
+            vnode: Vnode;
+            position: number;
+            path: string;
         }
-        | {
-            type: 'INSERT_CHILD';
-            payload: {
-                vnode: Vnode;
-                position: number;
-                path: string;
-            }
+    }
+
+    type RemoveChildAction = {
+        type: 'REMOVE_CHILD';
+        payload: number;
+    }
+
+    type UpdateChildAction = {
+        type: 'UPDATE_CHILD';
+        payload: {
+            index: number;
+            changes: DiffAction[]
         }
-        | {
-            type: 'REMOVE_CHILD';
-            payload: number;
+    }
+
+    type UpdateChildrenAction = {
+        type: 'UPDATE_CHILDREN';
+        payload: DiffAction[]
+    }
+
+    type InsertBeforeAction = {
+        type: 'INSERT_BEFORE';
+        payload: number;
+    }
+
+    type ReplaceNodeAction = {
+        type: 'REPLACE_NODE';
+        payload: {
+            prevVnode: Vnode;
+            nextVnode: Vnode;
+            path: string;
         }
-        | {
-            type: 'UPDATE_CHILD';
-            payload: {
-                index: number;
-                changes: DiffAction[]
-            }
-        }
-        | {
-            type: 'UPDATE_CHILDREN';
-            payload: DiffAction[]
-        }
-        | {
-            type: 'INSERT_BEFORE';
-            payload: number;
-        }
-        | {
-            type: 'REPLACE_NODE';
-            payload: {
-                prevVnode: Vnode | void;
-                nextVnode: Vnode | void;
-                path: string;
-            }
-        }
-        | {
-            type: 'REMOVE_NODE';
-            payload: {
-                vnode: Vnode | void;
-            };
-        }
-        | {
-            type: 'UPDATE_THUNK';
-            payload: {
-                prevVnode: ThunkVnode;
-                nextVnode: ThunkVnode;
-                path: string;
-            };
-        }
-        | {
-            type: 'SAME_NODE';
-        }
+    }
+
+    type RemoveNodeAction = {
+        type: 'REMOVE_NODE';
+        payload: {
+            vnode: Vnode;
+        };
+    }
+
+    type UpdateThunkAction = {
+        type: 'UPDATE_THUNK';
+        payload: {
+            prevVnode: ThunkVnode;
+            nextVnode: ThunkVnode;
+            path: string;
+        };
+    }
 }

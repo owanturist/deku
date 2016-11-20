@@ -14,8 +14,7 @@ import {
     removeNode,
     updateChild,
     updateThunk,
-    insertBefore,
-    sameNode
+    insertBefore
 } from '../actions';
 import {
     diffAttributes,
@@ -259,9 +258,7 @@ describe('Diff', () => {
                     vnode,
                     'root'
                 )
-            ).toEqual([
-                sameNode()
-            ]);
+            ).toEqual([]);
         });
 
         it('diffing nodes with different types', () => {
