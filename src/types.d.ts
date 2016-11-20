@@ -9,13 +9,19 @@ declare namespace Deku {
         key?: Key;
     }
 
-    interface Props {}
+    interface Props { }
 
     type Child
         = Vnode
         | string
         | number
         | null
+
+    interface KeyPatching {
+        key: Key;
+        vnode: Vnode;
+        index: number;
+    }
 
     type Vnode
         = NativeVnode
@@ -47,4 +53,73 @@ declare namespace Deku {
     interface EmptyVnode {
         type: 'empty';
     }
+
+    type DiffAction
+        = {
+            type: 'SET_ATTRIBUTE';
+            payload: {
+                attribute: string;
+                prevValue: any;
+                nextValue: any;
+            };
+        }
+        | {
+            type: 'REMOVE_ATTRIBUTE';
+            payload: {
+                attribute: string;
+                value: any;
+            }
+        }
+        | {
+            type: 'INSERT_CHILD';
+            payload: {
+                vnode: Vnode;
+                position: number;
+                path: string;
+            }
+        }
+        | {
+            type: 'REMOVE_CHILD';
+            payload: number;
+        }
+        | {
+            type: 'UPDATE_CHILD';
+            payload: {
+                index: number;
+                changes: DiffAction[]
+            }
+        }
+        | {
+            type: 'UPDATE_CHILDREN';
+            payload: DiffAction[]
+        }
+        | {
+            type: 'INSERT_BEFORE';
+            payload: number;
+        }
+        | {
+            type: 'REPLACE_NODE';
+            payload: {
+                prevVnode: Vnode | void;
+                nextVnode: Vnode | void;
+                path: string;
+            }
+        }
+        | {
+            type: 'REMOVE_NODE';
+            payload: {
+                vnode: Vnode | void;
+            };
+        }
+        | {
+            type: 'UPDATE_THUNK';
+            payload: {
+                prevVnode: ThunkVnode;
+                nextVnode: ThunkVnode;
+                path: string;
+            };
+        }
+        | {
+            type: 'SAME_NODE';
+        }
 }

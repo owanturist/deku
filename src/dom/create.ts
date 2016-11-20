@@ -5,7 +5,7 @@ import {
     createElement
 } from 'utils';
 import {
-    createPath
+    createNestingPath
 } from 'vnode';
 import {
     set as setAttribute
@@ -54,29 +54,6 @@ export function create(
 
         case 'empty': {
             return DOMNodeFactory('noscript');
-        }
-
-        default: {
-            throw new Error('Vnode type is invalid.');
-        }
-    }
-}
-
-
-function createNestingPath(
-    child: Deku.Vnode,
-    path: string,
-    fallback: number
-): string {
-    switch (child.type) {
-        case 'native':
-        case 'thunk': {
-            return createPath([ path, child.key || fallback ]);
-        }
-
-        case 'text':
-        case 'empty': {
-            return createPath([ path, fallback ]);
         }
 
         default: {

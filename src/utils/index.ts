@@ -1,12 +1,12 @@
-export function isNil(value: any): boolean {
+export function isNil(value: any): value is void {
     return value == undefined; // tslint:disable-line triple-equals
 }
 
-export function isNull(value: any): value is null {
+export function isNull(value: any): value is void {
     return value === null;
 }
 
-export function isUndefined(value: any): value is undefined {
+export function isUndefined(value: any): value is void {
     return value === undefined;
 }
 

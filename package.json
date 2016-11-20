@@ -13,15 +13,15 @@
     "test:coverage": "node_modules/.bin/jest --coverage"
   },
   "devDependencies": {
-    "@types/jest": "^15.1.32",
+    "@types/jest": "^16.0.0",
     "awesome-typescript-loader": "^2.2.4",
-    "jest": "^17.0.0",
+    "jest": "^17.0.3",
     "ts-jest": "^17.0.0",
     "typescript": "^2.0.8",
     "webpack": "^1.13.3"
   },
   "dependencies": {
-    "dift": "0.1.12"
+    "dift": "^0.1.12"
   },
   "keywords": [
     "deku",

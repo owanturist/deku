@@ -72,7 +72,7 @@ function createFromChild(child: Deku.Child): Deku.Vnode {
 }
 
 
-function createNative(
+export function createNative(
     tagName: string,
     attributes: Deku.Props,
     children: Deku.Vnode[],
@@ -88,7 +88,7 @@ function createNative(
 }
 
 
-function createThunk(
+export function createThunk(
     render,
     props: Deku.Props,
     children: Deku.Vnode[],
@@ -104,7 +104,7 @@ function createThunk(
 }
 
 
-function createText(text: string): Deku.TextVnode {
+export function createText(text: string): Deku.TextVnode {
     return {
         type: 'text',
         text
@@ -112,13 +112,108 @@ function createText(text: string): Deku.TextVnode {
 }
 
 
-function createEmpty(): Deku.EmptyVnode {
+export function createEmpty(): Deku.EmptyVnode {
     return {
         type: 'empty'
     };
 }
 
 
+export function isSameNativeVnodes(
+    left: Deku.NativeVnode,
+    right: Deku.NativeVnode
+): boolean {
+    return left.tagName === right.tagName;
+}
+
+
+export function isSameThunkVnodes(
+    left: Deku.ThunkVnode,
+    right: Deku.ThunkVnode
+): boolean {
+    return left.render === right.render;
+}
+
+
+export function isSameTextVnodes(
+    left: Deku.TextVnode,
+    right: Deku.TextVnode
+): boolean {
+    return left.text === right.text;
+}
+
+
 export function createPath(parts: (string | number)[]): string {
     return parts.join('.');
+}
+
+
+export function createNestingPath(
+    vnode: Deku.Vnode,
+    path: string,
+    fallback: number
+): string {
+    switch (vnode.type) {
+        case 'native':
+        case 'thunk': {
+            return createPath([ path, vnode.key || fallback ]);
+        }
+
+        case 'text':
+        case 'empty': {
+            return createPath([ path, fallback ]);
+        }
+
+        default: {
+            throw new Error('Vnode type is invalid.');
+        }
+    }
+}
+
+
+export function buildKeyPatching(vnodes: Deku.Vnode[]): Deku.KeyPatching[] {
+    const { length } = vnodes;
+
+    if (length === 0) {
+        return [];
+    }
+
+    const result = [];
+
+    for (let index = 0; index < length; index++) {
+        const vnode = vnodes[ index ];
+
+        switch (vnode.type) {
+            case 'native':
+            case 'thunk': {
+                result[ index ] = {
+                    key: vnode.key || index,
+                    vnode,
+                    index
+                };
+                continue;
+            }
+
+            case 'text':
+            case 'empty': {
+                result[ index ] = {
+                    key: index,
+                    vnode,
+                    index
+                };
+                continue;
+            }
+
+            default: {
+                throw new Error('Vnode type is invalid.');
+            }
+        }
+    }
+
+    return result;
+}
+
+
+export function getKey(keyPatching: Deku.KeyPatching): Deku.Key | void {
+    return keyPatching.key;
 }
