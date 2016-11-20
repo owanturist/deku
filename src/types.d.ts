@@ -15,7 +15,8 @@ declare namespace Deku {
         = Vnode
         | string
         | number
-        | null
+        | boolean
+        | void
 
     interface KeyPatching {
         key: Key;

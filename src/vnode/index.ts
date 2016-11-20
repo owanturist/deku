@@ -5,26 +5,21 @@ import {
     isNull
 } from 'utils';
 
+
 export function create(
     type: string,
     attributes?: Deku.Attributes,
     ...children: Deku.Child[]
 ): Deku.Vnode {
     let key;
-    const vnodeChildren = [];
+    const vnodeChildren = buildVnodeChildren(children);
 
     if (isNil(attributes)) {
         attributes = {};
-    } else {
+    } else if ('key' in attributes) {
         key = attributes.key;
 
         delete attributes.key;
-    }
-
-    for (let child of children) {
-        vnodeChildren.push(
-            createFromChild(child)
-        );
     }
 
     switch (typeof type) {
@@ -43,32 +38,47 @@ export function create(
 }
 
 
-function createFromChild(child: Deku.Child): Deku.Vnode {
-    switch (typeof child) {
-        case 'undefined': {
-            throw new Error(`Child can't be undefined. Did you mean to use null?`);
-        }
+function buildVnodeChildren(children: Deku.Child[]): Deku.Vnode[] {
+    if (children.length === 0) {
+        return [];
+    }
 
-        case 'string': {
-            return createText(child as string);
-        }
+    const result = [];
 
-        case 'number': {
-            return createText(String(child));
-        }
-
-        case 'object': {
-            if (isNull(child)) {
-                return createEmpty();
+    for (let child of children) {
+        switch (typeof child) {
+            case 'undefined': {
+                throw new Error(`Child can't be undefined. Did you mean to use null?`);
             }
 
-            return child as Deku.Vnode;
-        }
+            case 'string': {
+                result.push(
+                    createText(child as string)
+                );
+                break;
+            }
 
-        default: {
-            return child as Deku.Vnode;
+            case 'number': {
+                result.push(
+                    createText(String(child))
+                );
+                break;
+            }
+
+            case 'object': {
+                result.push(
+                    isNull(child) ? createEmpty() : child
+                );
+                break;
+            }
+
+            default: {
+                // do nothing
+            }
         }
     }
+
+    return result;
 }
 
 
@@ -76,7 +86,7 @@ export function createNative(
     tagName: string,
     attributes: Deku.Props,
     children: Deku.Vnode[],
-    key?: Deku.Key
+    key: Deku.Key
 ): Deku.NativeVnode {
     return {
         type: 'native',
@@ -92,7 +102,7 @@ export function createThunk(
     render,
     props: Deku.Props,
     children: Deku.Vnode[],
-    key?: Deku.Key
+    key: Deku.Key
 ): Deku.ThunkVnode {
     return {
         type: 'thunk',
@@ -143,8 +153,8 @@ export function isSameTextVnodes(
 }
 
 
-export function createPath(parts: (string | number)[]): string {
-    return parts.join('.');
+export function concatPath(a: Deku.Key, b: Deku.Key): string {
+    return `${a}.${b}`;
 }
 
 
@@ -156,12 +166,12 @@ export function createNestingPath(
     switch (vnode.type) {
         case 'native':
         case 'thunk': {
-            return createPath([ path, vnode.key || fallback ]);
+            return concatPath(path, vnode.key || fallback);
         }
 
         case 'text':
         case 'empty': {
-            return createPath([ path, fallback ]);
+            return concatPath(path, fallback);
         }
 
         default: {
@@ -191,7 +201,7 @@ export function buildKeyPatching(vnodes: Deku.Vnode[]): Deku.KeyPatching[] {
                     vnode,
                     index
                 };
-                continue;
+                break;
             }
 
             case 'text':
@@ -201,7 +211,7 @@ export function buildKeyPatching(vnodes: Deku.Vnode[]): Deku.KeyPatching[] {
                     vnode,
                     index
                 };
-                continue;
+                break;
             }
 
             default: {

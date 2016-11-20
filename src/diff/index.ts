@@ -10,7 +10,7 @@ import {
     isSameThunkVnodes,
     isSameTextVnodes,
     getKey,
-    createPath,
+    concatPath,
     buildKeyPatching
 } from 'vnode';
 import {
@@ -118,9 +118,9 @@ export function diffAttributes(
     const changes = [];
 
     for (let name in nextAttrs) {
-        if (nextAttrs[name] !== prevAttrs[name]) {
+        if (nextAttrs[ name ] !== prevAttrs[ name ]) {
             changes.push(
-                setAttribute(name, nextAttrs[name], prevAttrs[name])
+                setAttribute(name, nextAttrs[ name ], prevAttrs[ name ])
             );
         }
     }
@@ -128,7 +128,7 @@ export function diffAttributes(
     for (let name in prevAttrs) {
         if (!nextAttrs.hasOwnProperty(name)) {
             changes.push(
-                removeAttribute(name, prevAttrs[name])
+                removeAttribute(name, prevAttrs[ name ])
             );
         }
     }
@@ -161,7 +161,7 @@ export function diffChildren(
                         insertChild(
                             next.vnode,
                             position,
-                            createPath([parentPath, next.key])
+                            concatPath(parentPath, next.key)
                         )
                     );
 
@@ -172,7 +172,7 @@ export function diffChildren(
                     const childChanges = diffVnodes(
                         prev.vnode,
                         next.vnode,
-                        createPath([parentPath, next.key])
+                        concatPath(parentPath, next.key)
                     );
 
                     if (childChanges.length !== 0) {
@@ -188,7 +188,7 @@ export function diffChildren(
                     const childChanges = diffVnodes(
                         prev.vnode,
                         next.vnode,
-                        createPath([parentPath, next.key])
+                        concatPath(parentPath, next.key)
                     );
                     childChanges.push(
                         insertBefore(position)
