@@ -2,8 +2,7 @@ import Deku from 'types';
 import dift, { CREATE, UPDATE, MOVE, REMOVE } from 'dift';
 
 import {
-    isUndefined,
-    isNull
+    isUndefined
 } from 'utils';
 import {
     isSameNativeVnodes,
@@ -28,14 +27,10 @@ import {
 
 
 export function diffVnodes(
-    prevVnode: Deku.Vnode | void,
+    prevVnode: Deku.Vnode,
     nextVnode: Deku.Vnode | void,
     path: string
 ): Deku.DiffAction[] {
-    if (isUndefined(prevVnode)) {
-        throw new Error('Left node must not be null or undefined');
-    }
-
     if (isUndefined(nextVnode)) {
         return [
             removeNode(prevVnode)
@@ -46,14 +41,7 @@ export function diffVnodes(
         return [];
     }
 
-    const prevNullable = isNull(prevVnode);
-    const nextNullable = isNull(nextVnode);
-
-    if (
-        !prevNullable && nextNullable ||
-        prevNullable && !nextNullable ||
-        prevVnode.type !== nextVnode.type
-    ) {
+    if (prevVnode.type !== nextVnode.type) {
         return [
             replaceNode(prevVnode, nextVnode, path)
         ];
@@ -63,10 +51,11 @@ export function diffVnodes(
         case 'native': {
             if (isSameNativeVnodes(prevVnode as Deku.NativeVnode, nextVnode)) {
                 const changes = diffAttributes(prevVnode as Deku.NativeVnode, nextVnode);
+                const childChanges = diffChildren(prevVnode as Deku.NativeVnode, nextVnode, path);
 
-                changes.push(
-                    diffChildren(prevVnode as Deku.NativeVnode, nextVnode, path)
-                );
+                if (childChanges.payload.length !== 0) {
+                    changes.push(childChanges);
+                }
 
                 return changes;
             }
@@ -98,7 +87,6 @@ export function diffVnodes(
             ];
         }
 
-        case 'empty':
         default: {
             return [];
         }
@@ -138,7 +126,7 @@ export function diffChildren(
     prevVnode: Deku.NativeVnode,
     nextVnode: Deku.NativeVnode,
     parentPath: string
-): Deku.DiffAction {
+): Deku.UpdateChildrenAction {
     const prevChildren = prevVnode.children;
     const nextChildren = nextVnode.children;
     const changes = [];

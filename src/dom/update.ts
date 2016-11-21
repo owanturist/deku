@@ -1,6 +1,14 @@
 import Deku from 'types';
 
 import {
+    diffVnodes
+} from 'diff';
+import {
+    concatPath,
+    isThunk,
+    isNative
+} from 'vnode';
+import {
     set as setAttribute,
     remove as removeAttribute
 } from './attribute';
@@ -59,16 +67,26 @@ export function update(
 
             DOMNode.parentNode.replaceChild(newDOMNode, DOMNode);
             DOMNode = newDOMNode;
+            removeThunks(change.payload.prevVnode, dispatch);
             break;
         }
 
         case 'REMOVE_NODE': {
+            removeThunks(change.payload, dispatch);
             DOMNode.parentNode.removeChild(DOMNode);
             DOMNode = null;
             break;
         }
 
         case 'UPDATE_THUNK': {
+            updateThunk(
+                DOMNode,
+                change.payload.prevVnode,
+                change.payload.nextVnode,
+                change.payload.path,
+                dispatch,
+                context
+            );
             break;
         }
 
@@ -81,7 +99,7 @@ export function update(
 }
 
 
-export function updateChildren(
+function updateChildren(
     DOMNode: Node,
     changes: Deku.DiffAction[],
     dispatch: any,
@@ -132,6 +150,46 @@ export function updateChildren(
             default: {
                 // do nothing
             }
+        }
+    }
+}
+
+
+function updateThunk(
+    DOMNode: Node,
+    prevVnode: Deku.ThunkVnode,
+    nextVnode: Deku.ThunkVnode,
+    path: string,
+    dispatch: any,
+    context: any
+): Node {
+    const { props, children } = nextVnode;
+    const model = { children, props, path, dispatch, context };
+    const vnode = nextVnode.render(model);
+    const changes = diffVnodes(
+        prevVnode.state.vnode,
+        vnode,
+        concatPath(path, 0)
+    );
+
+    for (let change of changes) {
+        DOMNode = update(DOMNode, change, dispatch, context);
+    }
+
+    nextVnode.state = { vnode, model };
+
+    return DOMNode;
+}
+
+
+function removeThunks(vnode: Deku.Vnode, dispatch: any): void {
+    while (isThunk(vnode)) {
+        vnode = vnode.state.vnode;
+    }
+
+    if (isNative(vnode) && vnode.children.length !== 0) {
+        for (let child of vnode.children) {
+            removeThunks(child, dispatch);
         }
     }
 }

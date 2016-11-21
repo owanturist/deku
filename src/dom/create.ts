@@ -106,6 +106,11 @@ function createThunk(
     const outputPath = createNestingPath(outputVnode, path, 0);
     const DOMNode = create(outputVnode, outputPath, dispatch, context);
 
+    vnode.state = {
+        vnode: outputVnode,
+        model
+    };
+
     return DOMNode;
 }
 

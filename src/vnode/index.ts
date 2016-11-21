@@ -131,6 +131,16 @@ export function createEmpty(): Deku.EmptyVnode {
 }
 
 
+export function isNative(vnode: Deku.Vnode): vnode is Deku.NativeVnode {
+    return vnode.type === 'native';
+}
+
+
+export function isThunk(vnode: Deku.Vnode): vnode is Deku.ThunkVnode {
+    return vnode.type === 'thunk';
+}
+
+
 export function isSameNativeVnodes(
     left: Deku.NativeVnode,
     right: Deku.NativeVnode

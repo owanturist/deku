@@ -9,14 +9,18 @@ declare namespace Deku {
         key?: Key;
     }
 
-    interface Props { }
+    interface Props {}
 
-    type Child
+    type _Child
         = Vnode
         | string
         | number
         | boolean
         | void
+
+    type Child
+        = _Child
+        | _Child[]
 
     interface KeyPatching {
         key: Key;
@@ -44,6 +48,10 @@ declare namespace Deku {
         props: Props;
         children: Vnode[];
         key?: Key;
+        state?: {
+            vnode: Vnode;
+            model: any;
+        }
     }
 
     interface TextVnode {
@@ -67,7 +75,7 @@ declare namespace Deku {
         | RemoveNodeAction
         | UpdateThunkAction
 
-    type SetAttributeAction = {
+    interface SetAttributeAction {
         type: 'SET_ATTRIBUTE';
         payload: {
             attribute: string;
@@ -76,7 +84,7 @@ declare namespace Deku {
         };
     }
 
-    type RemoveAttributeAction = {
+    interface RemoveAttributeAction {
         type: 'REMOVE_ATTRIBUTE';
         payload: {
             attribute: string;
@@ -84,7 +92,7 @@ declare namespace Deku {
         }
     }
 
-    type InsertChildAction = {
+    interface InsertChildAction {
         type: 'INSERT_CHILD';
         payload: {
             vnode: Vnode;
@@ -93,12 +101,12 @@ declare namespace Deku {
         }
     }
 
-    type RemoveChildAction = {
+    interface RemoveChildAction {
         type: 'REMOVE_CHILD';
         payload: number;
     }
 
-    type UpdateChildAction = {
+    interface UpdateChildAction {
         type: 'UPDATE_CHILD';
         payload: {
             index: number;
@@ -106,17 +114,17 @@ declare namespace Deku {
         }
     }
 
-    type UpdateChildrenAction = {
+    interface UpdateChildrenAction {
         type: 'UPDATE_CHILDREN';
         payload: DiffAction[]
     }
 
-    type InsertBeforeAction = {
+    interface InsertBeforeAction {
         type: 'INSERT_BEFORE';
         payload: number;
     }
 
-    type ReplaceNodeAction = {
+    interface ReplaceNodeAction {
         type: 'REPLACE_NODE';
         payload: {
             prevVnode: Vnode;
@@ -125,14 +133,12 @@ declare namespace Deku {
         }
     }
 
-    type RemoveNodeAction = {
+    interface RemoveNodeAction {
         type: 'REMOVE_NODE';
-        payload: {
-            vnode: Vnode;
-        };
+        payload: Vnode;
     }
 
-    type UpdateThunkAction = {
+    interface UpdateThunkAction {
         type: 'UPDATE_THUNK';
         payload: {
             prevVnode: ThunkVnode;

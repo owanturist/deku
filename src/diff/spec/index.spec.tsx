@@ -195,7 +195,7 @@ describe('Diff', () => {
                     'root'
                 )
             ).toEqual(
-                updateChildren([])  // TODO: replace to empty list
+                updateChildren([])
             );
         });
 
@@ -232,15 +232,10 @@ describe('Diff', () => {
                 )
             ).toEqual(
                 updateChildren([
-                    updateChild(0, [
-                        updateChildren([])
-                    ]),
                     updateChild(1, [
-                        updateChildren([]),
                         insertBefore(3)
                     ]),
                     updateChild(2, [
-                        updateChildren([]),
                         insertBefore(2)
                     ])
                 ])
@@ -264,36 +259,6 @@ describe('Diff', () => {
         it('diffing nodes with different types', () => {
             const prevVnode = <div />;
             const nextVnode = <span />;
-
-            expect(
-                diffVnodes(
-                    prevVnode,
-                    nextVnode,
-                    'root'
-                )
-            ).toEqual([
-                replaceNode(prevVnode, nextVnode, 'root')
-            ]);
-        });
-
-        it('diffing node with null', () => {
-            const prevVnode = <div />;
-            const nextVnode = null;
-
-            expect(
-                diffVnodes(
-                    prevVnode,
-                    nextVnode,
-                    'root'
-                )
-            ).toEqual([
-                replaceNode(prevVnode, nextVnode, 'root')
-            ]);
-        });
-
-        it('diffing with a current node as null', () => {
-            const prevVnode = null;
-            const nextVnode = <div />;
 
             expect(
                 diffVnodes(
