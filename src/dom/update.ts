@@ -87,6 +87,13 @@ export function updateChildren(
     dispatch: any,
     context: any
 ): void {
+    const childNodes = [];
+    const { length } = DOMNode.childNodes;
+
+    for (let index = 0; index < length; index++) {
+        childNodes[ index ] = DOMNode.childNodes.item(index);
+    }
+
     for (let change of changes) {
         switch (change.type) {
             case 'INSERT_CHILD': {
@@ -105,7 +112,7 @@ export function updateChildren(
 
             case 'REMOVE_CHILD': {
                 DOMNode.removeChild(
-                    DOMNode.childNodes.item(change.payload)
+                    childNodes[ change.payload ]
                 );
                 break;
             }
@@ -113,7 +120,7 @@ export function updateChildren(
             case 'UPDATE_CHILD': {
                 for (let subChange of change.payload.changes) {
                     update(
-                        DOMNode.childNodes.item(change.payload.index),
+                        childNodes[ change.payload.index ],
                         subChange,
                         dispatch,
                         context

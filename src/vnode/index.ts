@@ -12,7 +12,9 @@ export function create(
     ...children: Deku.Child[]
 ): Deku.Vnode {
     let key;
-    const vnodeChildren = buildVnodeChildren(children);
+    const vnodeChildren = [];
+
+    buildVnodeChildren(vnodeChildren, children);
 
     if (isNil(attributes)) {
         attributes = {};
@@ -38,12 +40,10 @@ export function create(
 }
 
 
-function buildVnodeChildren(children: Deku.Child[]): Deku.Vnode[] {
+function buildVnodeChildren(acc: Deku.Vnode[], children: Deku.Child[]): void {
     if (children.length === 0) {
-        return [];
+        return;
     }
-
-    const result = [];
 
     for (let child of children) {
         switch (typeof child) {
@@ -52,23 +52,27 @@ function buildVnodeChildren(children: Deku.Child[]): Deku.Vnode[] {
             }
 
             case 'string': {
-                result.push(
+                acc.push(
                     createText(child as string)
                 );
                 break;
             }
 
             case 'number': {
-                result.push(
+                acc.push(
                     createText(String(child))
                 );
                 break;
             }
 
             case 'object': {
-                result.push(
-                    isNull(child) ? createEmpty() : child
-                );
+                if (Array.isArray(child)) {
+                    buildVnodeChildren(acc, child);
+                } else if (isNull(child)) {
+                    acc.push(createEmpty());
+                } else {
+                    acc.push(child as Deku.Vnode);
+                }
                 break;
             }
 
@@ -77,8 +81,6 @@ function buildVnodeChildren(children: Deku.Child[]): Deku.Vnode[] {
             }
         }
     }
-
-    return result;
 }
 
 
@@ -224,6 +226,6 @@ export function buildKeyPatching(vnodes: Deku.Vnode[]): Deku.KeyPatching[] {
 }
 
 
-export function getKey(keyPatching: Deku.KeyPatching): Deku.Key | void {
+export function getKey(keyPatching: Deku.KeyPatching): Deku.Key {
     return keyPatching.key;
 }

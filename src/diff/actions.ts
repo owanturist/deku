@@ -70,8 +70,8 @@ export function insertBefore(
 }
 
 export function replaceNode(
-    prevVnode: Deku.Vnode | void,
-    nextVnode: Deku.Vnode | void,
+    prevVnode: Deku.Vnode,
+    nextVnode: Deku.Vnode,
     path: string
 ): Deku.DiffAction {
     return {
@@ -81,7 +81,7 @@ export function replaceNode(
 }
 
 export function removeNode(
-    vnode: Deku.Vnode | void
+    vnode: Deku.Vnode
 ): Deku.DiffAction {
     return {
         type: 'REMOVE_NODE',
