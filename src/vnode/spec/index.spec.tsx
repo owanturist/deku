@@ -1,4 +1,15 @@
-import deku from 'deku';
+import deku from '../../deku';
+
+import {
+    noop
+} from 'utils';
+import {
+    NATIVE,
+    THUNK,
+    TEXT,
+    EMPTY
+} from 'vnode';
+
 
 describe('Element', () => {
     describe('NativeElement', () => {
@@ -6,7 +17,7 @@ describe('Element', () => {
             expect(
                 <div />
             ).toEqual({
-                type: 'native',
+                type: NATIVE,
                 tagName: 'div',
                 attributes: {},
                 children: [],
@@ -18,7 +29,7 @@ describe('Element', () => {
             expect(
                 <div key='key' />
             ).toEqual({
-                type: 'native',
+                type: NATIVE,
                 tagName: 'div',
                 attributes: {},
                 children: [],
@@ -30,7 +41,7 @@ describe('Element', () => {
             expect(
                 <div width='300px' height='400px' />
             ).toEqual({
-                type: 'native',
+                type: NATIVE,
                 tagName: 'div',
                 attributes: {
                     width: '300px',
@@ -47,35 +58,35 @@ describe('Element', () => {
                     string <span /> {123} {null}
                 </div>
             ).toEqual({
-                type: 'native',
+                type: NATIVE,
                 tagName: 'div',
                 attributes: {},
                 children: [
                     {
-                        type: 'text',
+                        type: TEXT,
                         text: 'string '
                     },
                     {
-                        type: 'native',
+                        type: NATIVE,
                         tagName: 'span',
                         attributes: {},
                         children: [],
                         key: undefined
                     },
                     {
-                        type: 'text',
+                        type: TEXT,
                         text: ' '
                     },
                     {
-                        type: 'text',
+                        type: TEXT,
                         text: '123'
                     },
                     {
-                        type: 'text',
+                        type: TEXT,
                         text: ' '
                     },
                     {
-                        type: 'empty'
+                        type: EMPTY
                     }
                 ],
                 key: undefined
@@ -94,11 +105,14 @@ describe('Element', () => {
             expect(
                 <Thunk />
             ).toEqual({
-                type: 'thunk',
+                type: THUNK,
                 render: Thunk,
                 props: {},
                 children: [],
-                key: undefined
+                key: undefined,
+                onMount: noop,
+                onUnmount: noop,
+                onUpdate: noop
             });
         });
 
@@ -106,11 +120,14 @@ describe('Element', () => {
             expect(
                 <Thunk key={123} />
             ).toEqual({
-                type: 'thunk',
+                type: THUNK,
                 render: Thunk,
                 props: {},
                 children: [],
-                key: 123
+                key: 123,
+                onMount: noop,
+                onUnmount: noop,
+                onUpdate: noop
             });
         });
 
@@ -118,14 +135,17 @@ describe('Element', () => {
             expect(
                 <Thunk foo='foo' bar={123} />
             ).toEqual({
-                type: 'thunk',
+                type: THUNK,
                 render: Thunk,
                 props: {
                     foo: 'foo',
                     bar: 123
                 },
                 children: [],
-                key: undefined
+                key: undefined,
+                onMount: noop,
+                onUnmount: noop,
+                onUpdate: noop
             });
         });
 
@@ -135,19 +155,25 @@ describe('Element', () => {
                     <Thunk key='child' />
                 </Thunk>
             ).toEqual({
-                type: 'thunk',
+                type: THUNK,
                 render: Thunk,
                 props: {},
                 children: [
                     {
-                        type: 'thunk',
+                        type: THUNK,
                         render: Thunk,
                         props: {},
                         children: [],
-                        key: 'child'
+                        key: 'child',
+                        onMount: noop,
+                        onUnmount: noop,
+                        onUpdate: noop
                     }
                 ],
-                key: 'parent'
+                key: 'parent',
+                onMount: noop,
+                onUnmount: noop,
+                onUpdate: noop
             });
         });
     });

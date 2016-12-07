@@ -1,17 +1,188 @@
-import Deku from 'types';
-
 import {
+    noop,
     isNil,
     isNull
 } from 'utils';
 
 
+export type Key
+    = string
+    | number
+
+export type Props = {};
+
+export type Attributes = Props & {
+    key?: Key
+}
+
+export type Model = {
+    children: Vnode[],
+    props: Props,
+    path: string,
+    dispatch: any,
+    context: any
+}
+
+export type State = {
+    vnode: Vnode,
+    model: Model
+}
+
+export type Render = (model: Model) => Vnode
+
+export type Hook = (model: Model) => void
+
+export type Lifecycle = {
+    onMount: Hook,
+    onUpdate: Hook,
+    onUnmount: Hook
+}
+
+export type Component = Lifecycle & {
+    render: Render
+}
+
+export type Config
+    = string
+    | Render
+    | Component
+
+type Child
+    = null
+    | string
+    | number
+    | boolean
+    | Vnode
+    | ArrayOfChildren
+
+interface ArrayOfChildren extends Array<Child> {}
+
+export type KeyPatching = {
+    vnode: Vnode,
+    position: number,
+    key: Key
+}
+
+export type Vnode
+    = Native
+    | Thunk
+    | Text
+    | Empty
+
+
+export type NATIVE = 'VNODE/NATIVE';
+export const NATIVE: NATIVE = 'VNODE/NATIVE';
+export type Native = {
+    type: NATIVE,
+    tagName: string,
+    attributes: Attributes,
+    children: Vnode[],
+    key: Key
+}
+
+export function createNative(
+    tagName: string,
+    attributes: Attributes,
+    children: Vnode[],
+    key: Key
+    ): Native {
+    return {
+        type: NATIVE,
+        tagName,
+        attributes,
+        children,
+        key
+    };
+}
+
+export function isSameNative(leftVnode: Native, rightVnode: Native): boolean {
+    return leftVnode.tagName === rightVnode.tagName;
+}
+
+export function isNative(vnode: Vnode): vnode is Native {
+    return vnode.type === NATIVE;
+}
+
+
+export type THUNK = 'VNODE/THUNK';
+export const THUNK: THUNK = 'VNODE/THUNK';
+export type Thunk = Lifecycle & {
+    type: THUNK,
+    render: Render,
+    props: Props,
+    children: Vnode[],
+    key: Key,
+    state?: State
+}
+
+export function createThunk(
+    render: Render,
+    props: Props,
+    children: Vnode[],
+    key: Key,
+    onMount: Hook = noop,
+    onUpdate: Hook = noop,
+    onUnmount: Hook = noop
+    ): Thunk {
+    return {
+        type: THUNK,
+        render,
+        props,
+        children,
+        key,
+        onMount,
+        onUpdate,
+        onUnmount
+    };
+}
+
+export function isSameThunk(leftVnode: Thunk, rightVnode: Thunk): boolean {
+    return leftVnode.render === rightVnode.render;
+}
+
+export function isThunk(vnode: Vnode): vnode is Thunk {
+    return vnode.type === THUNK;
+}
+
+
+export type TEXT = 'VNODE/TEXT';
+export const TEXT: TEXT = 'VNODE/TEXT';
+export type Text = {
+    type: TEXT,
+    text: string
+}
+
+export function createText(text: string): Text {
+    return {
+        type: TEXT,
+        text
+    };
+}
+
+export function isSameText(leftVnode: Text, rightVnode: Text): boolean {
+    return leftVnode.text === rightVnode.text;
+}
+
+
+export type EMPTY = 'VNODE/EMPTY';
+export const EMPTY: EMPTY = 'VNODE/EMPTY';
+export type Empty = {
+    type: EMPTY
+}
+
+export function createEmpty(): Empty {
+    return {
+        type: EMPTY
+    };
+}
+
+
 export function create(
-    type: string,
-    attributes?: Deku.Attributes,
-    ...children: Deku.Child[]
-): Deku.Vnode {
-    let key;
+    config: Config,
+    attributes?: Attributes,
+    ...children: Child[]
+    ): Vnode {
+    let key: Key;
     const vnodeChildren = [];
 
     buildVnodeChildren(vnodeChildren, children);
@@ -24,13 +195,35 @@ export function create(
         delete attributes.key;
     }
 
-    switch (typeof type) {
-        case 'function': {
-            return createThunk(type, attributes, vnodeChildren, key);
+    switch (typeof config) {
+        case 'string': {
+            return createNative(
+                config as string,
+                attributes,
+                vnodeChildren,
+                key
+            );
         }
 
-        case 'string': {
-            return createNative(type, attributes, vnodeChildren, key);
+        case 'function': {
+            return createThunk(
+                config as Render,
+                attributes,
+                vnodeChildren,
+                key
+            );
+        }
+
+        case 'object': {
+            return createThunk(
+                (config as Component).render,
+                attributes,
+                vnodeChildren,
+                key,
+                (config as Component).onMount,
+                (config as Component).onUpdate,
+                (config as Component).onUnmount
+            );
         }
 
         default: {
@@ -40,7 +233,7 @@ export function create(
 }
 
 
-function buildVnodeChildren(acc: Deku.Vnode[], children: Deku.Child[]): void {
+function buildVnodeChildren(acc: Vnode[], children: Child[]): void {
     if (children.length === 0) {
         return;
     }
@@ -48,7 +241,9 @@ function buildVnodeChildren(acc: Deku.Vnode[], children: Deku.Child[]): void {
     for (let child of children) {
         switch (typeof child) {
             case 'undefined': {
-                throw new Error(`Child can't be undefined. Did you mean to use null?`);
+                throw new Error(
+                    `Child can't be undefined. Did you mean to use null?`
+                );
             }
 
             case 'string': {
@@ -69,9 +264,11 @@ function buildVnodeChildren(acc: Deku.Vnode[], children: Deku.Child[]): void {
                 if (Array.isArray(child)) {
                     buildVnodeChildren(acc, child);
                 } else if (isNull(child)) {
-                    acc.push(createEmpty());
+                    acc.push(
+                        createEmpty()
+                    );
                 } else {
-                    acc.push(child as Deku.Vnode);
+                    acc.push(child as Vnode);
                 }
                 break;
             }
@@ -84,106 +281,25 @@ function buildVnodeChildren(acc: Deku.Vnode[], children: Deku.Child[]): void {
 }
 
 
-export function createNative(
-    tagName: string,
-    attributes: Deku.Props,
-    children: Deku.Vnode[],
-    key: Deku.Key
-): Deku.NativeVnode {
-    return {
-        type: 'native',
-        tagName,
-        attributes,
-        children,
-        key
-    };
+export function concatKeys(leftKey: Key, rightKey: Key): string {
+    return `${leftKey}.${rightKey}`;
 }
 
 
-export function createThunk(
-    render,
-    props: Deku.Props,
-    children: Deku.Vnode[],
-    key: Deku.Key
-): Deku.ThunkVnode {
-    return {
-        type: 'thunk',
-        render,
-        props,
-        children,
-        key
-    };
-}
-
-
-export function createText(text: string): Deku.TextVnode {
-    return {
-        type: 'text',
-        text
-    };
-}
-
-
-export function createEmpty(): Deku.EmptyVnode {
-    return {
-        type: 'empty'
-    };
-}
-
-
-export function isNative(vnode: Deku.Vnode): vnode is Deku.NativeVnode {
-    return vnode.type === 'native';
-}
-
-
-export function isThunk(vnode: Deku.Vnode): vnode is Deku.ThunkVnode {
-    return vnode.type === 'thunk';
-}
-
-
-export function isSameNativeVnodes(
-    left: Deku.NativeVnode,
-    right: Deku.NativeVnode
-): boolean {
-    return left.tagName === right.tagName;
-}
-
-
-export function isSameThunkVnodes(
-    left: Deku.ThunkVnode,
-    right: Deku.ThunkVnode
-): boolean {
-    return left.render === right.render;
-}
-
-
-export function isSameTextVnodes(
-    left: Deku.TextVnode,
-    right: Deku.TextVnode
-): boolean {
-    return left.text === right.text;
-}
-
-
-export function concatPath(a: Deku.Key, b: Deku.Key): string {
-    return `${a}.${b}`;
-}
-
-
-export function createNestingPath(
-    vnode: Deku.Vnode,
+export function concatPaths(
     path: string,
-    fallback: number
-): string {
+    vnode: Vnode,
+    fallback: Key
+    ): string {
     switch (vnode.type) {
-        case 'native':
-        case 'thunk': {
-            return concatPath(path, vnode.key || fallback);
+        case NATIVE:
+        case THUNK: {
+            return concatKeys(path, vnode.key || fallback);
         }
 
-        case 'text':
-        case 'empty': {
-            return concatPath(path, fallback);
+        case TEXT:
+        case EMPTY: {
+            return concatKeys(path, fallback);
         }
 
         default: {
@@ -193,7 +309,34 @@ export function createNestingPath(
 }
 
 
-export function buildKeyPatching(vnodes: Deku.Vnode[]): Deku.KeyPatching[] {
+export function createKeyPatching(vnode: Vnode, position: number): KeyPatching {
+    switch (vnode.type) {
+        case NATIVE:
+        case THUNK: {
+            return {
+                vnode,
+                position,
+                key: vnode.key || position
+            };
+        }
+
+        case TEXT:
+        case EMPTY: {
+            return {
+                vnode,
+                position,
+                key: position
+            };
+        }
+
+        default: {
+            throw new Error('Vnode type is invalid.');
+        }
+    }
+}
+
+
+export function buildKeyPatching(vnodes: Vnode[]): KeyPatching[] {
     const { length } = vnodes;
 
     if (length === 0) {
@@ -203,39 +346,13 @@ export function buildKeyPatching(vnodes: Deku.Vnode[]): Deku.KeyPatching[] {
     const result = [];
 
     for (let index = 0; index < length; index++) {
-        const vnode = vnodes[ index ];
-
-        switch (vnode.type) {
-            case 'native':
-            case 'thunk': {
-                result[ index ] = {
-                    key: vnode.key || index,
-                    vnode,
-                    index
-                };
-                break;
-            }
-
-            case 'text':
-            case 'empty': {
-                result[ index ] = {
-                    key: index,
-                    vnode,
-                    index
-                };
-                break;
-            }
-
-            default: {
-                throw new Error('Vnode type is invalid.');
-            }
-        }
+        result[ index ] = createKeyPatching(vnodes[ index ], index);
     }
 
     return result;
 }
 
 
-export function getKey(keyPatching: Deku.KeyPatching): Deku.Key {
+export function getKey(keyPatching: KeyPatching): Key {
     return keyPatching.key;
 }
