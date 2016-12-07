@@ -1,29 +1,36 @@
-import Deku from 'types';
-
 import {
-    isUndefined,
-    createElement
+    isUndefined
 } from 'utils';
 import {
-    createNestingPath
+    NATIVE as NATIVE_VNODE,
+    THUNK as THUNK_VNODE,
+    TEXT as TEXT_VNODE,
+    EMPTY as EMPTY_VNODE,
+    Vnode,
+    Native as NativeVnode,
+    Thunk as ThunkVnode,
+    concatPaths
 } from 'vnode';
 import {
     set as setAttribute
 } from './attribute';
+import {
+    createDOMElement
+} from './element';
 
 
-interface FactoryCache {
+type FactoryCache = {
     [ tagName: string ]: Element;
 }
 
-export function createDOMNodeFactory() {
+function createDOMNodeFactory() {
     const cache: FactoryCache = {};
 
     return (tagName: string): Node => {
         let cachedNode = cache[ tagName ];
 
         if (isUndefined(cachedNode)) {
-            cachedNode = cache[ tagName ] = createElement(tagName);
+            cachedNode = cache[ tagName ] = createDOMElement(tagName);
         }
 
         return cachedNode.cloneNode(false);
@@ -33,42 +40,12 @@ export function createDOMNodeFactory() {
 const DOMNodeFactory = createDOMNodeFactory();
 
 
-export function create(
-    vnode: Deku.Vnode,
-    path: string,
-    dispatch: any,
-    context: any
-): Node {
-    switch (vnode.type) {
-        case 'native': {
-            return createNative(vnode, path, dispatch, context);
-        }
-
-        case 'thunk': {
-            return createThunk(vnode, path, dispatch, context);
-        }
-
-        case 'text': {
-            return createText(vnode.text);
-        }
-
-        case 'empty': {
-            return DOMNodeFactory('noscript');
-        }
-
-        default: {
-            throw new Error('Vnode type is invalid.');
-        }
-    }
-}
-
-
 function createNative(
-    vnode: Deku.NativeVnode,
+    vnode: NativeVnode,
     path: string,
     dispatch: any,
     context: any
-): Node {
+    ): Node {
     const { tagName, attributes, children } = vnode;
     const DOMNode = DOMNodeFactory(tagName);
     const { length } = children;
@@ -85,7 +62,7 @@ function createNative(
 
     for (let index = 0; index < length; index++) {
         const childVnode = children[ index ];
-        const childPath = createNestingPath(childVnode, path, index);
+        const childPath = concatPaths(path, childVnode, index);
         const childNode = create(childVnode, childPath, dispatch, context);
 
         DOMNode.appendChild(childNode);
@@ -95,17 +72,18 @@ function createNative(
 }
 
 function createThunk(
-    vnode: Deku.ThunkVnode,
+    vnode: ThunkVnode,
     path: string,
     dispatch: any,
     context: any
-): Node {
+    ): Node {
     const { props, children } = vnode;
     const model = { children, props, path, dispatch, context };
     const outputVnode = vnode.render(model);
-    const outputPath = createNestingPath(outputVnode, path, 0);
+    const outputPath = concatPaths(path, outputVnode, 0);
     const DOMNode = create(outputVnode, outputPath, dispatch, context);
 
+    vnode.onMount(model);
     vnode.state = {
         vnode: outputVnode,
         model
@@ -117,4 +95,34 @@ function createThunk(
 
 function createText(text: string): Text {
     return document.createTextNode(text);
+}
+
+
+export function create(
+    vnode: Vnode,
+    path: string,
+    dispatch: any,
+    context: any
+    ): Node {
+    switch (vnode.type) {
+        case NATIVE_VNODE: {
+            return createNative(vnode, path, dispatch, context);
+        }
+
+        case THUNK_VNODE: {
+            return createThunk(vnode, path, dispatch, context);
+        }
+
+        case TEXT_VNODE: {
+            return createText(vnode.text);
+        }
+
+        case EMPTY_VNODE: {
+            return DOMNodeFactory('noscript');
+        }
+
+        default: {
+            throw new Error('Vnode type is invalid.');
+        }
+    }
 }

@@ -286,11 +286,7 @@ export function concatKeys(leftKey: Key, rightKey: Key): string {
 }
 
 
-export function concatPaths(
-    path: string,
-    vnode: Vnode,
-    fallback: Key
-    ): string {
+export function concatPaths(path: string, vnode: Vnode, fallback: Key): string {
     switch (vnode.type) {
         case NATIVE:
         case THUNK: {

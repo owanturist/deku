@@ -1,5 +1,3 @@
-import Deku from 'types';
-
 import {
     create as createDOM
 } from 'dom/create';
@@ -10,14 +8,17 @@ import {
     diffVnodes
 } from 'diff';
 import {
+    Vnode
+} from 'vnode';
+import {
     isNil
 } from 'utils';
 
 export function create(container: HTMLElement, dispatch?, rootId = '0') {
-    let prevVnode: Deku.Vnode;
+    let prevVnode: Vnode;
     let DOMNode: Node;
 
-    function create(vnode: Deku.Vnode, context: any): Node {
+    function create(vnode: Vnode, context: any): Node {
         DOMNode = createDOM(vnode, rootId, dispatch, context);
         container.appendChild(DOMNode);
         prevVnode = vnode;
@@ -25,7 +26,7 @@ export function create(container: HTMLElement, dispatch?, rootId = '0') {
         return DOMNode;
     }
 
-    function update(nextVnode: Deku.Vnode, context: any): Node {
+    function update(nextVnode: Vnode, context: any): Node {
         const changes = diffVnodes(prevVnode, nextVnode, rootId);
 
         for (let change of changes) {
@@ -37,7 +38,7 @@ export function create(container: HTMLElement, dispatch?, rootId = '0') {
         return DOMNode;
     }
 
-    return (vnode: Deku.Vnode, context?): Node => {
+    return (vnode: Vnode, context?): Node => {
         return isNil(DOMNode) ?
             create(vnode, context) :
             update(vnode, context);

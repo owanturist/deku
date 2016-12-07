@@ -47,7 +47,7 @@ export function set(
     attribute: string,
     nextValue: any,
     prevValue?: any
-): void {
+    ): void {
     if (nextValue === prevValue) {
         return;
     }
@@ -116,7 +116,7 @@ export function remove(
     DOMNode: Node,
     attribute: string,
     prevValue?: any
-): void {
+    ): void {
     const eventType = getEventByAttribute(attribute);
 
     if (isString(eventType) && isFunction(prevValue)) {

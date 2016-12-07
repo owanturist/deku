@@ -1,3 +1,7 @@
+export function noop(): void {
+    return;
+}
+
 export function isNil(value: any): value is void {
     return value == undefined; // tslint:disable-line triple-equals
 }
@@ -16,35 +20,4 @@ export function isString(value: any): value is string {
 
 export function isFunction(value: any): value is Function {
     return typeof value === 'function';
-}
-
-export function createElement(tagName: string): Element {
-    switch (tagName) {
-        case 'animate':
-        case 'circle':
-        case 'clipPath':
-        case 'defs':
-        case 'ellipse':
-        case 'g':
-        case 'line':
-        case 'linearGradient':
-        case 'mask':
-        case 'path':
-        case 'pattern':
-        case 'polygon':
-        case 'polyline':
-        case 'radialGradient':
-        case 'rect':
-        case 'stop':
-        case 'svg':
-        case 'text':
-        case 'tspan':
-        case 'use': {
-            return document.createElementNS('http://www.w3.org/2000/svg', tagName);
-        }
-
-        default: {
-            return document.createElement(tagName);
-        }
-    }
 }

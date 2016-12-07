@@ -1,6 +1,6 @@
 import {
     Vnode,
-    Thunk
+    Thunk as ThunkVnode
 } from 'vnode';
 
 export type Change
@@ -199,15 +199,15 @@ export const UPDATE_THUNK: UPDATE_THUNK = 'CHANGE/UPDATE_THUNK';
 export type UpdateThunk = {
     type: UPDATE_THUNK,
     payload: {
-        prevThunk: Vnode,
-        nextThunk: Vnode,
+        prevThunk: ThunkVnode,
+        nextThunk: ThunkVnode,
         path: string
     }
 };
 
 export function updateThunk(
-    prevThunk: Thunk,
-    nextThunk: Thunk,
+    prevThunk: ThunkVnode,
+    nextThunk: ThunkVnode,
     path: string
     ): UpdateThunk {
     return {

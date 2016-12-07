@@ -1,12 +1,25 @@
-import Deku from 'types';
-
 import {
     diffVnodes
 } from 'diff';
 import {
-    concatPath,
-    isThunk,
-    isNative
+    SET_ATTRIBUTE,
+    REMOVE_ATTRIBUTE,
+    INSERT_CHILD,
+    REMOVE_CHILD,
+    UPDATE_CHILD,
+    UPDATE_CHILDREN,
+    INSERT_BEFORE,
+    REPLACE_NODE,
+    REMOVE_NODE,
+    UPDATE_THUNK,
+    Change
+} from 'diff/changes';
+import {
+    concatKeys,
+    Vnode,
+    Thunk as ThunkVnode,
+    isThunk as isThunkVnode,
+    isNative as isNativeVnode
 } from 'vnode';
 import {
     set as setAttribute,
@@ -19,12 +32,12 @@ import {
 
 export function update(
     DOMNode: Node,
-    change: Deku.DiffAction,
+    change: Change,
     dispatch: any,
     context: any
-): Node {
+    ): Node {
     switch (change.type) {
-        case 'SET_ATTRIBUTE': {
+        case SET_ATTRIBUTE: {
             setAttribute(
                 DOMNode,
                 change.payload.attribute,
@@ -34,7 +47,7 @@ export function update(
             break;
         }
 
-        case 'REMOVE_ATTRIBUTE': {
+        case REMOVE_ATTRIBUTE: {
             removeAttribute(
                 DOMNode,
                 change.payload.attribute,
@@ -43,12 +56,12 @@ export function update(
             break;
         }
 
-        case 'UPDATE_CHILDREN': {
+        case UPDATE_CHILDREN: {
             updateChildren(DOMNode, change.payload, dispatch, context);
             break;
         }
 
-        case 'INSERT_BEFORE': {
+        case INSERT_BEFORE: {
             insertAtPosition(
                 DOMNode.parentNode,
                 change.payload,
@@ -57,7 +70,7 @@ export function update(
             break;
         }
 
-        case 'REPLACE_NODE': {
+        case REPLACE_NODE: {
             const newDOMNode = create(
                 change.payload.nextVnode,
                 change.payload.path,
@@ -67,22 +80,22 @@ export function update(
 
             DOMNode.parentNode.replaceChild(newDOMNode, DOMNode);
             DOMNode = newDOMNode;
-            removeThunks(change.payload.prevVnode, dispatch);
+            removeThunks(change.payload.prevVnode);
             break;
         }
 
-        case 'REMOVE_NODE': {
-            removeThunks(change.payload, dispatch);
+        case REMOVE_NODE: {
+            removeThunks(change.payload);
             DOMNode.parentNode.removeChild(DOMNode);
             DOMNode = null;
             break;
         }
 
-        case 'UPDATE_THUNK': {
+        case UPDATE_THUNK: {
             updateThunk(
                 DOMNode,
-                change.payload.prevVnode,
-                change.payload.nextVnode,
+                change.payload.prevThunk,
+                change.payload.nextThunk,
                 change.payload.path,
                 dispatch,
                 context
@@ -101,11 +114,11 @@ export function update(
 
 function updateChildren(
     DOMNode: Node,
-    changes: Deku.DiffAction[],
+    changes: Change[],
     dispatch: any,
     context: any
-): void {
-    const childNodes = [];
+    ): void {
+    let childNodes = [];
     const { length } = DOMNode.childNodes;
 
     for (let index = 0; index < length; index++) {
@@ -114,7 +127,7 @@ function updateChildren(
 
     for (let change of changes) {
         switch (change.type) {
-            case 'INSERT_CHILD': {
+            case INSERT_CHILD: {
                 insertAtPosition(
                     DOMNode,
                     change.payload.position,
@@ -128,17 +141,17 @@ function updateChildren(
                 break;
             }
 
-            case 'REMOVE_CHILD': {
+            case REMOVE_CHILD: {
                 DOMNode.removeChild(
                     childNodes[ change.payload ]
                 );
                 break;
             }
 
-            case 'UPDATE_CHILD': {
+            case UPDATE_CHILD: {
                 for (let subChange of change.payload.changes) {
                     update(
-                        childNodes[ change.payload.index ],
+                        childNodes[ change.payload.position ],
                         subChange,
                         dispatch,
                         context
@@ -157,39 +170,44 @@ function updateChildren(
 
 function updateThunk(
     DOMNode: Node,
-    prevVnode: Deku.ThunkVnode,
-    nextVnode: Deku.ThunkVnode,
+    prevVnode: ThunkVnode,
+    nextVnode: ThunkVnode,
     path: string,
     dispatch: any,
     context: any
-): Node {
+    ): Node {
     const { props, children } = nextVnode;
     const model = { children, props, path, dispatch, context };
-    const vnode = nextVnode.render(model);
+    const outputVnode = nextVnode.render(model);
     const changes = diffVnodes(
         prevVnode.state.vnode,
-        vnode,
-        concatPath(path, 0)
+        outputVnode,
+        concatKeys(path, 0)
     );
 
     for (let change of changes) {
         DOMNode = update(DOMNode, change, dispatch, context);
     }
 
-    nextVnode.state = { vnode, model };
+    nextVnode.onUpdate(model);
+    nextVnode.state = {
+        vnode: outputVnode,
+        model
+    };
 
     return DOMNode;
 }
 
 
-function removeThunks(vnode: Deku.Vnode, dispatch: any): void {
-    while (isThunk(vnode)) {
+function removeThunks(vnode: Vnode): void {
+    while (isThunkVnode(vnode)) {
+        vnode.onUnmount(vnode.state.model);
         vnode = vnode.state.vnode;
     }
 
-    if (isNative(vnode) && vnode.children.length !== 0) {
+    if (isNativeVnode(vnode) && vnode.children.length !== 0) {
         for (let child of vnode.children) {
-            removeThunks(child, dispatch);
+            removeThunks(child);
         }
     }
 }
@@ -199,7 +217,7 @@ function insertAtPosition(
     parentDOMNode: Node,
     position: number,
     DOMNode: Node
-): void {
+    ): void {
     const refDOMNode = parentDOMNode.childNodes.item(position);
 
     if (refDOMNode) {
