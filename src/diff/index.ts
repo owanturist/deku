@@ -1,18 +1,27 @@
-import Deku from 'types';
 import dift, { CREATE, UPDATE, MOVE, REMOVE } from 'dift';
 
 import {
     isUndefined
 } from 'utils';
 import {
-    isSameNativeVnodes,
-    isSameThunkVnodes,
-    isSameTextVnodes,
+    NATIVE as NATIVE_VNODE,
+    THUNK as THUNK_VNODE,
+    TEXT as TEXT_VNODE,
+    Vnode,
+    Native as NativeVnode,
+    Thunk as ThunkVnode,
+    Text as TextVnode,
+    isSameNative as isSameNativeVnodes,
+    isSameThunk as isSameThunkVnodes,
+    isSameText as isSameTextVnodes,
+    KeyPatching,
     getKey,
-    concatPath,
+    concatKeys,
     buildKeyPatching
 } from 'vnode';
 import {
+    Change,
+    UpdateChildren,
     setAttribute,
     removeAttribute,
     insertChild,
@@ -23,14 +32,14 @@ import {
     updateChild,
     updateThunk,
     insertBefore
-} from './actions';
+} from './changes';
 
 
 export function diffVnodes(
-    prevVnode: Deku.Vnode,
-    nextVnode: Deku.Vnode | void,
+    prevVnode: Vnode,
+    nextVnode: Vnode | undefined,
     path: string
-): Deku.DiffAction[] {
+    ): Change[] {
     if (isUndefined(nextVnode)) {
         return [
             removeNode(prevVnode)
@@ -48,10 +57,10 @@ export function diffVnodes(
     }
 
     switch (nextVnode.type) {
-        case 'native': {
-            if (isSameNativeVnodes(prevVnode as Deku.NativeVnode, nextVnode)) {
-                const changes = diffAttributes(prevVnode as Deku.NativeVnode, nextVnode);
-                const childChanges = diffChildren(prevVnode as Deku.NativeVnode, nextVnode, path);
+        case NATIVE_VNODE: {
+            if (isSameNativeVnodes(prevVnode as NativeVnode, nextVnode)) {
+                const changes = diffAttributes(prevVnode as NativeVnode, nextVnode);
+                const childChanges = diffChildren(prevVnode as NativeVnode, nextVnode, path);
 
                 if (childChanges.payload.length !== 0) {
                     changes.push(childChanges);
@@ -65,10 +74,10 @@ export function diffVnodes(
             ];
         }
 
-        case 'thunk': {
-            if (isSameThunkVnodes(prevVnode as Deku.ThunkVnode, nextVnode)) {
+        case THUNK_VNODE: {
+            if (isSameThunkVnodes(prevVnode as ThunkVnode, nextVnode)) {
                 return [
-                    updateThunk(prevVnode as Deku.ThunkVnode, nextVnode, path)
+                    updateThunk(prevVnode as ThunkVnode, nextVnode, path)
                 ];
             }
 
@@ -77,13 +86,13 @@ export function diffVnodes(
             ];
         }
 
-        case 'text': {
-            if (isSameTextVnodes(prevVnode as Deku.TextVnode, nextVnode)) {
+        case TEXT_VNODE: {
+            if (isSameTextVnodes(prevVnode as TextVnode, nextVnode)) {
                 return [];
             }
 
             return [
-                setAttribute('nodeValue', nextVnode.text, (prevVnode as Deku.TextVnode).text)
+                setAttribute('nodeValue', nextVnode.text, (prevVnode as TextVnode).text)
             ];
         }
 
@@ -95,9 +104,9 @@ export function diffVnodes(
 
 
 export function diffAttributes(
-    prevVnode: Deku.NativeVnode,
-    nextVnode: Deku.NativeVnode
-): Deku.DiffAction[] {
+    prevVnode: NativeVnode,
+    nextVnode: NativeVnode
+    ): Change[] {
     const prevAttrs = prevVnode.attributes;
     const nextAttrs = nextVnode.attributes;
     const changes = [];
@@ -123,10 +132,10 @@ export function diffAttributes(
 
 
 export function diffChildren(
-    prevVnode: Deku.NativeVnode,
-    nextVnode: Deku.NativeVnode,
+    prevVnode: NativeVnode,
+    nextVnode: NativeVnode,
     parentPath: string
-): Deku.UpdateChildrenAction {
+    ): UpdateChildren {
     const prevChildren = prevVnode.children;
     const nextChildren = nextVnode.children;
     const changes = [];
@@ -135,9 +144,9 @@ export function diffChildren(
         buildKeyPatching(prevChildren),
         buildKeyPatching(nextChildren),
         (
-            type: string,
-            prev: Deku.KeyPatching,
-            next?: Deku.KeyPatching,
+            type: number,
+            prev: KeyPatching,
+            next?: KeyPatching,
             position?: number
         ): void => {
             switch (type) {
@@ -146,7 +155,7 @@ export function diffChildren(
                         insertChild(
                             next.vnode,
                             position,
-                            concatPath(parentPath, next.key)
+                            concatKeys(parentPath, next.key)
                         )
                     );
 
@@ -157,12 +166,12 @@ export function diffChildren(
                     const childChanges = diffVnodes(
                         prev.vnode,
                         next.vnode,
-                        concatPath(parentPath, next.key)
+                        concatKeys(parentPath, next.key)
                     );
 
                     if (childChanges.length !== 0) {
                         changes.push(
-                            updateChild(prev.index, childChanges)
+                            updateChild(prev.position, childChanges)
                         );
                     }
 
@@ -173,13 +182,13 @@ export function diffChildren(
                     const childChanges = diffVnodes(
                         prev.vnode,
                         next.vnode,
-                        concatPath(parentPath, next.key)
+                        concatKeys(parentPath, next.key)
                     );
                     childChanges.push(
                         insertBefore(position)
                     );
                     changes.push(
-                        updateChild(prev.index, childChanges)
+                        updateChild(prev.position, childChanges)
                     );
 
                     break;
@@ -187,7 +196,7 @@ export function diffChildren(
 
                 case REMOVE: {
                     changes.push(
-                        removeChild(prev.index)
+                        removeChild(prev.position)
                     );
 
                     break;

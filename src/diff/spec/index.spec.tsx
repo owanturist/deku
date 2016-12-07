@@ -1,4 +1,4 @@
-import deku from 'deku';
+import deku from '../../deku';
 
 import {
     createText,
@@ -15,7 +15,7 @@ import {
     updateChild,
     updateThunk,
     insertBefore
-} from '../actions';
+} from '../changes';
 import {
     diffAttributes,
     diffChildren,
