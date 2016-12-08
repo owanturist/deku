@@ -1,4 +1,7 @@
 import {
+    isUndefined
+} from 'utils';
+import {
     diffVnodes
 } from 'diff';
 import {
@@ -118,11 +121,20 @@ function updateChildren(
     dispatch: any,
     context: any
     ): void {
-    let childNodes = [];
-    const { length } = DOMNode.childNodes;
+    let childNodes: Node[];
 
-    for (let index = 0; index < length; index++) {
-        childNodes[ index ] = DOMNode.childNodes.item(index);
+    function getChildNode(position: number): Node {
+        if (isUndefined(childNodes)) {
+            childNodes = [];
+
+            const { length } = DOMNode.childNodes;
+
+            for (let index = 0; index < length; index++) {
+                childNodes[ index ] = DOMNode.childNodes.item(index);
+            }
+        }
+
+        return childNodes[ position ];
     }
 
     for (let change of changes) {
@@ -143,7 +155,7 @@ function updateChildren(
 
             case REMOVE_CHILD: {
                 DOMNode.removeChild(
-                    childNodes[ change.payload ]
+                    getChildNode(change.payload)
                 );
                 break;
             }
@@ -151,7 +163,7 @@ function updateChildren(
             case UPDATE_CHILD: {
                 for (let subChange of change.payload.changes) {
                     update(
-                        childNodes[ change.payload.position ],
+                        getChildNode(change.payload.position),
                         subChange,
                         dispatch,
                         context
