@@ -4,9 +4,9 @@ import {
     isUndefined
 } from 'utils';
 import {
-    NATIVE as NATIVE_VNODE,
-    THUNK as THUNK_VNODE,
-    TEXT as TEXT_VNODE,
+    NATIVE,
+    THUNK,
+    TEXT,
     Vnode,
     Native as NativeVnode,
     Thunk as ThunkVnode,
@@ -57,7 +57,7 @@ export function diffVnodes(
     }
 
     switch (nextVnode.type) {
-        case NATIVE_VNODE: {
+        case NATIVE: {
             if (isSameNativeVnodes(prevVnode as NativeVnode, nextVnode)) {
                 const changes = diffAttributes(prevVnode as NativeVnode, nextVnode);
                 const childChanges = diffChildren(prevVnode as NativeVnode, nextVnode, path);
@@ -74,7 +74,7 @@ export function diffVnodes(
             ];
         }
 
-        case THUNK_VNODE: {
+        case THUNK: {
             if (isSameThunkVnodes(prevVnode as ThunkVnode, nextVnode)) {
                 return [
                     updateThunk(prevVnode as ThunkVnode, nextVnode, path)
@@ -86,7 +86,7 @@ export function diffVnodes(
             ];
         }
 
-        case TEXT_VNODE: {
+        case TEXT: {
             if (isSameTextVnodes(prevVnode as TextVnode, nextVnode)) {
                 return [];
             }

@@ -2,10 +2,10 @@ import {
     isUndefined
 } from 'utils';
 import {
-    NATIVE as NATIVE_VNODE,
-    THUNK as THUNK_VNODE,
-    TEXT as TEXT_VNODE,
-    EMPTY as EMPTY_VNODE,
+    NATIVE,
+    THUNK,
+    TEXT,
+    EMPTY,
     Vnode,
     Native as NativeVnode,
     Thunk as ThunkVnode,
@@ -105,19 +105,19 @@ export function create(
     context: any
     ): Node {
     switch (vnode.type) {
-        case NATIVE_VNODE: {
+        case NATIVE: {
             return createNative(vnode, path, dispatch, context);
         }
 
-        case THUNK_VNODE: {
+        case THUNK: {
             return createThunk(vnode, path, dispatch, context);
         }
 
-        case TEXT_VNODE: {
+        case TEXT: {
             return createText(vnode.text);
         }
 
-        case EMPTY_VNODE: {
+        case EMPTY: {
             return DOMNodeFactory('noscript');
         }
 
