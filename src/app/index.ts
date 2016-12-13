@@ -8,17 +8,18 @@ import {
     diffVnodes
 } from 'diff';
 import {
+    Context,
     Vnode
 } from 'vnode';
 import {
     isNil
 } from 'utils';
 
-export function create(container: HTMLElement, rootId = '0') {
-    let prevVnode: Vnode;
+export function create<P, C>(container: HTMLElement, rootId = '0') {
+    let prevVnode: Vnode<P, C>;
     let DOMNode: Node;
 
-    function create(vnode: Vnode, context: any): Node {
+    function create(vnode: Vnode<P, C>, context: Context<C>): Node {
         DOMNode = createDOM(vnode, rootId, context);
         container.appendChild(DOMNode);
         prevVnode = vnode;
@@ -26,7 +27,7 @@ export function create(container: HTMLElement, rootId = '0') {
         return DOMNode;
     }
 
-    function update(nextVnode: Vnode, context: any): Node {
+    function update(nextVnode: Vnode<P, C>, context: Context<C>): Node {
         const changes = diffVnodes(prevVnode, nextVnode, rootId);
 
         for (let change of changes) {
@@ -38,7 +39,7 @@ export function create(container: HTMLElement, rootId = '0') {
         return DOMNode;
     }
 
-    return (vnode: Vnode, context?): Node => {
+    return (vnode: Vnode<P, C>, context?: Context<C>): Node => {
         return isNil(DOMNode) ?
             create(vnode, context) :
             update(vnode, context);

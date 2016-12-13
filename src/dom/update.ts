@@ -19,6 +19,7 @@ import {
     Change
 } from 'diff/changes';
 import {
+    Context,
     concatKeys,
     Vnode,
     NATIVE,
@@ -36,10 +37,10 @@ import {
 } from './create';
 
 
-export function update(
+export function update<P, C>(
     DOMNode: Node,
-    change: Change,
-    context: any
+    change: Change<P, C>,
+    context: Context<C>
     ): Node {
     switch (change.type) {
         case SET_ATTRIBUTE: {
@@ -126,10 +127,10 @@ export function update(
 }
 
 
-function updateChildren(
+function updateChildren<P, C>(
     DOMNode: Node,
-    changes: Change[],
-    context: any
+    changes: Change<P, C>[],
+    context: Context<C>
     ): void {
     let childNodes: Node[];
 
@@ -188,12 +189,12 @@ function updateChildren(
 }
 
 
-function updateComponent(
+function updateComponent<P, C>(
     DOMNode: Node,
-    prevVnode: ComponentVnode,
-    nextVnode: ComponentVnode,
+    prevVnode: ComponentVnode<P, C>,
+    nextVnode: ComponentVnode<P, C>,
     path: string,
-    context: any
+    context: Context<C>
     ): Node {
     const { props, children } = nextVnode;
     const model = { children, props, path, context };
@@ -218,12 +219,12 @@ function updateComponent(
 }
 
 
-function updateThunk(
+function updateThunk<P, C>(
     DOMNode: Node,
-    prevVnode: ThunkVnode,
-    nextVnode: ThunkVnode,
+    prevVnode: ThunkVnode<P, C>,
+    nextVnode: ThunkVnode<P, C>,
     path: string,
-    context: any
+    context: Context<C>
     ): Node {
     const { props, children } = nextVnode;
     const model = { children, props, path, context };
@@ -246,7 +247,7 @@ function updateThunk(
 }
 
 
-function removeThunksAndComponents(vnode: Vnode): void {
+function removeThunksAndComponents<C, P>(vnode: Vnode<C, P>): void {
     while (true) {
         switch (vnode.type) {
             case COMPONENT: {

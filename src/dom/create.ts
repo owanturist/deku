@@ -2,6 +2,7 @@ import {
     isUndefined
 } from 'utils';
 import {
+    Context,
     NATIVE,
     COMPONENT,
     THUNK,
@@ -42,10 +43,10 @@ function createDOMNodeFactory() {
 const DOMNodeFactory = createDOMNodeFactory();
 
 
-function createNative(
-    vnode: NativeVnode,
+function createNative<P, C>(
+    vnode: NativeVnode<P, C>,
     path: string,
-    context: any
+    context: Context<C>
     ): Node {
     const { tagName, attributes, children } = vnode;
     const DOMNode = DOMNodeFactory(tagName);
@@ -73,10 +74,10 @@ function createNative(
 }
 
 
-function createComponent(
-    vnode: ComponentVnode,
+function createComponent<P, C>(
+    vnode: ComponentVnode<P, C>,
     path: string,
-    context: any
+    context: Context<C>
     ): Node {
     const { props, children } = vnode;
     const model = { children, props, path, context };
@@ -94,8 +95,8 @@ function createComponent(
 }
 
 
-function createThunk(
-    vnode: ThunkVnode,
+function createThunk<P, C>(
+    vnode: ThunkVnode<P, C>,
     path: string,
     context: any
     ): Node {
@@ -118,10 +119,10 @@ function createText(text: string): Text {
 }
 
 
-export function create(
-    vnode: Vnode,
+export function create<P, C>(
+    vnode: Vnode<P, C>,
     path: string,
-    context: any
+    context: Context<C>
     ): Node {
     switch (vnode.type) {
         case NATIVE: {

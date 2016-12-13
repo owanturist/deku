@@ -39,11 +39,11 @@ import {
 } from './changes';
 
 
-export function diffVnodes(
-    prevVnode: Vnode,
-    nextVnode: Vnode | undefined,
+export function diffVnodes<P, C>(
+    prevVnode: Vnode<P, C>,
+    nextVnode: Vnode<P, C> | undefined,
     path: string
-    ): Change[] {
+    ): Change<P, C>[] {
     if (isUndefined(nextVnode)) {
         return [
             removeNode(prevVnode)
@@ -62,9 +62,9 @@ export function diffVnodes(
 
     switch (nextVnode.type) {
         case NATIVE: {
-            if (isSameNativeVnodes(prevVnode as NativeVnode, nextVnode)) {
-                const changes = diffAttributes(prevVnode as NativeVnode, nextVnode);
-                const childChanges = diffChildren(prevVnode as NativeVnode, nextVnode, path);
+            if (isSameNativeVnodes(prevVnode as NativeVnode<P, C>, nextVnode)) {
+                const changes = diffAttributes(prevVnode as NativeVnode<P, C>, nextVnode);
+                const childChanges = diffChildren(prevVnode as NativeVnode<P, C>, nextVnode, path);
 
                 if (childChanges.payload.length !== 0) {
                     changes.push(childChanges);
@@ -79,9 +79,9 @@ export function diffVnodes(
         }
 
         case COMPONENT: {
-            if (isSameComponentVnodes(prevVnode as ComponentVnode, nextVnode)) {
+            if (isSameComponentVnodes(prevVnode as ComponentVnode<P, C>, nextVnode)) {
                 return [
-                    updateComponent(prevVnode as ComponentVnode, nextVnode, path)
+                    updateComponent(prevVnode as ComponentVnode<P, C>, nextVnode, path)
                 ];
             }
 
@@ -91,9 +91,9 @@ export function diffVnodes(
         }
 
         case THUNK: {
-            if (isSameThunkVnodes(prevVnode as ThunkVnode, nextVnode)) {
+            if (isSameThunkVnodes(prevVnode as ThunkVnode<P, C>, nextVnode)) {
                 return [
-                    updateThunk(prevVnode as ThunkVnode, nextVnode, path)
+                    updateThunk(prevVnode as ThunkVnode<P, C>, nextVnode, path)
                 ];
             }
 
@@ -119,10 +119,10 @@ export function diffVnodes(
 }
 
 
-export function diffAttributes(
-    prevVnode: NativeVnode,
-    nextVnode: NativeVnode
-    ): Change[] {
+export function diffAttributes<P, C>(
+    prevVnode: NativeVnode<P, C>,
+    nextVnode: NativeVnode<P, C>
+    ): Change<P, C>[] {
     const prevAttrs = prevVnode.attributes;
     const nextAttrs = nextVnode.attributes;
     const changes = [];
@@ -147,11 +147,11 @@ export function diffAttributes(
 }
 
 
-export function diffChildren(
-    prevVnode: NativeVnode,
-    nextVnode: NativeVnode,
+export function diffChildren<P, C>(
+    prevVnode: NativeVnode<P, C>,
+    nextVnode: NativeVnode<P, C>,
     parentPath: string
-    ): UpdateChildren {
+    ): UpdateChildren<P, C> {
     const prevChildren = prevVnode.children;
     const nextChildren = nextVnode.children;
     const changes = [];
@@ -161,8 +161,8 @@ export function diffChildren(
         buildKeyPatching(nextChildren),
         (
             type: number,
-            prev: KeyPatching,
-            next?: KeyPatching,
+            prev: KeyPatching<P, C>,
+            next?: KeyPatching<P, C>,
             position?: number
         ): void => {
             switch (type) {
@@ -226,6 +226,6 @@ export function diffChildren(
         getKey
     );
 
-    return updateChildren(changes);
+    return updateChildren<P, C>(changes);
 }
 

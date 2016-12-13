@@ -4,18 +4,18 @@ import {
     Thunk as ThunkVnode
 } from 'vnode';
 
-export type Change
+export type Change<P, C>
     = SetAttribute
     | RemoveAttribute
-    | InsertChild
+    | InsertChild<P, C>
     | RemoveChild
-    | UpdateChild
-    | UpdateChildren
+    | UpdateChild<P, C>
+    | UpdateChildren<P, C>
     | InsertBefore
-    | ReplaceNode
-    | RemoveNode
-    | UpdateThunk
-    | UpdateComponent
+    | ReplaceNode<P, C>
+    | RemoveNode<P, C>
+    | UpdateThunk<P, C>
+    | UpdateComponent<P, C>
 
 export type SET_ATTRIBUTE = 'CHANGE/SET_ATTRIBUTE';
 export const SET_ATTRIBUTE: SET_ATTRIBUTE = 'CHANGE/SET_ATTRIBUTE';
@@ -63,20 +63,20 @@ export function removeAttribute(
 
 export type INSERT_CHILD = 'CHANGE/INSERT_CHILD';
 export const INSERT_CHILD: INSERT_CHILD = 'CHANGE/INSERT_CHILD';
-export type InsertChild = {
+export type InsertChild<P, C> = {
     type: INSERT_CHILD,
     payload: {
-        vnode: Vnode,
+        vnode: Vnode<P, C>,
         position: number,
         path: string
     }
 };
 
-export function insertChild(
-    vnode: Vnode,
+export function insertChild<P, C>(
+    vnode: Vnode<P, C>,
     position: number,
     path: string
-    ): InsertChild {
+    ): InsertChild<P, C> {
     return {
         type: INSERT_CHILD,
         payload: { vnode, position, path }
@@ -103,18 +103,18 @@ export function removeChild(
 
 export type UPDATE_CHILD = 'CHANGE/UPDATE_CHILD';
 export const UPDATE_CHILD: UPDATE_CHILD = 'CHANGE/UPDATE_CHILD';
-export type UpdateChild = {
+export type UpdateChild<P, C> = {
     type: UPDATE_CHILD,
     payload: {
         position: number,
-        changes: Change[]
+        changes: Change<P, C>[]
     }
 };
 
-export function updateChild(
+export function updateChild<P, C>(
     position: number,
-    changes: Change[]
-    ): UpdateChild {
+    changes: Change<P, C>[]
+    ): UpdateChild<P, C> {
     return {
         type: UPDATE_CHILD,
         payload: { position, changes }
@@ -124,14 +124,14 @@ export function updateChild(
 
 export type UPDATE_CHILDREN = 'CHANGE/UPDATE_CHILDREN';
 export const UPDATE_CHILDREN: UPDATE_CHILDREN = 'CHANGE/UPDATE_CHILDREN';
-export type UpdateChildren = {
+export type UpdateChildren<P, C> = {
     type: UPDATE_CHILDREN,
-    payload: Change[]
+    payload: Change<P, C>[]
 };
 
-export function updateChildren(
-    changes: Change[]
-    ): UpdateChildren {
+export function updateChildren<P, C>(
+    changes: Change<P, C>[]
+    ): UpdateChildren<P, C> {
     return {
         type: UPDATE_CHILDREN,
         payload: changes
@@ -158,20 +158,20 @@ export function insertBefore(
 
 export type REPLACE_NODE = 'CHANGE/REPLACE_NODE';
 export const REPLACE_NODE: REPLACE_NODE = 'CHANGE/REPLACE_NODE';
-export type ReplaceNode = {
+export type ReplaceNode<P, C> = {
     type: REPLACE_NODE,
     payload: {
-        prevVnode: Vnode,
-        nextVnode: Vnode,
+        prevVnode: Vnode<P, C>,
+        nextVnode: Vnode<P, C>,
         path: string
     }
 };
 
-export function replaceNode(
-    prevVnode: Vnode,
-    nextVnode: Vnode,
+export function replaceNode<P, C>(
+    prevVnode: Vnode<P, C>,
+    nextVnode: Vnode<P, C>,
     path: string
-    ): ReplaceNode {
+    ): ReplaceNode<P, C> {
     return {
         type: REPLACE_NODE,
         payload: { prevVnode, nextVnode, path }
@@ -181,14 +181,14 @@ export function replaceNode(
 
 export type REMOVE_NODE = 'CHANGE/REMOVE_NODE';
 export const REMOVE_NODE: REMOVE_NODE = 'CHANGE/REMOVE_NODE';
-export type RemoveNode = {
+export type RemoveNode<P, C> = {
     type: REMOVE_NODE,
-    payload: Vnode
+    payload: Vnode<P, C>
 };
 
-export function removeNode(
-    vnode: Vnode
-    ): RemoveNode {
+export function removeNode<P, C>(
+    vnode: Vnode<P, C>
+    ): RemoveNode<P, C> {
     return {
         type: REMOVE_NODE,
         payload: vnode
@@ -198,20 +198,20 @@ export function removeNode(
 
 export type UPDATE_THUNK = 'CHANGE/UPDATE_THUNK';
 export const UPDATE_THUNK: UPDATE_THUNK = 'CHANGE/UPDATE_THUNK';
-export type UpdateThunk = {
+export type UpdateThunk<P, C> = {
     type: UPDATE_THUNK,
     payload: {
-        prevThunk: ThunkVnode,
-        nextThunk: ThunkVnode,
+        prevThunk: ThunkVnode<P, C>,
+        nextThunk: ThunkVnode<P, C>,
         path: string
     }
 };
 
-export function updateThunk(
-    prevThunk: ThunkVnode,
-    nextThunk: ThunkVnode,
+export function updateThunk<P, C>(
+    prevThunk: ThunkVnode<P, C>,
+    nextThunk: ThunkVnode<P, C>,
     path: string
-    ): UpdateThunk {
+    ): UpdateThunk<P, C> {
     return {
         type: UPDATE_THUNK,
         payload: { prevThunk, nextThunk, path }
@@ -221,20 +221,20 @@ export function updateThunk(
 
 export type UPDATE_COMPONENT = 'CHANGE/UPDATE_COMPONENT';
 export const UPDATE_COMPONENT: UPDATE_COMPONENT = 'CHANGE/UPDATE_COMPONENT';
-export type UpdateComponent = {
+export type UpdateComponent<P, C> = {
     type: UPDATE_COMPONENT,
     payload: {
-        prevThunk: ComponentVnode,
-        nextThunk: ComponentVnode,
+        prevThunk: ComponentVnode<P, C>,
+        nextThunk: ComponentVnode<P, C>,
         path: string
     }
 };
 
-export function updateComponent(
-    prevThunk: ComponentVnode,
-    nextThunk: ComponentVnode,
+export function updateComponent<P, C>(
+    prevThunk: ComponentVnode<P, C>,
+    nextThunk: ComponentVnode<P, C>,
     path: string
-    ): UpdateComponent {
+    ): UpdateComponent<P, C> {
     return {
         type: UPDATE_COMPONENT,
         payload: { prevThunk, nextThunk, path }
