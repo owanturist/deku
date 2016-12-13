@@ -19,7 +19,6 @@ export type Model = {
     readonly children: Vnode[],
     readonly props: Props,
     readonly path: string,
-    readonly dispatch: any,
     readonly context: any
 }
 

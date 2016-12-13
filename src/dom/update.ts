@@ -39,7 +39,6 @@ import {
 export function update(
     DOMNode: Node,
     change: Change,
-    dispatch: any,
     context: any
     ): Node {
     switch (change.type) {
@@ -63,7 +62,7 @@ export function update(
         }
 
         case UPDATE_CHILDREN: {
-            updateChildren(DOMNode, change.payload, dispatch, context);
+            updateChildren(DOMNode, change.payload, context);
             break;
         }
 
@@ -80,7 +79,6 @@ export function update(
             const newDOMNode = create(
                 change.payload.nextVnode,
                 change.payload.path,
-                dispatch,
                 context
             );
 
@@ -103,7 +101,6 @@ export function update(
                 change.payload.prevThunk,
                 change.payload.nextThunk,
                 change.payload.path,
-                dispatch,
                 context
             );
             break;
@@ -115,7 +112,6 @@ export function update(
                 change.payload.prevThunk,
                 change.payload.nextThunk,
                 change.payload.path,
-                dispatch,
                 context
             );
             break;
@@ -133,7 +129,6 @@ export function update(
 function updateChildren(
     DOMNode: Node,
     changes: Change[],
-    dispatch: any,
     context: any
     ): void {
     let childNodes: Node[];
@@ -161,7 +156,6 @@ function updateChildren(
                     create(
                         change.payload.vnode,
                         change.payload.path,
-                        dispatch,
                         context
                     )
                 );
@@ -180,7 +174,6 @@ function updateChildren(
                     update(
                         getChildNode(change.payload.position),
                         subChange,
-                        dispatch,
                         context
                     );
                 }
@@ -200,11 +193,10 @@ function updateComponent(
     prevVnode: ComponentVnode,
     nextVnode: ComponentVnode,
     path: string,
-    dispatch: any,
     context: any
     ): Node {
     const { props, children } = nextVnode;
-    const model = { children, props, path, dispatch, context };
+    const model = { children, props, path, context };
     const outputVnode = nextVnode.render(model);
     const changes = diffVnodes(
         prevVnode.state.vnode,
@@ -213,7 +205,7 @@ function updateComponent(
     );
 
     for (let change of changes) {
-        DOMNode = update(DOMNode, change, dispatch, context);
+        DOMNode = update(DOMNode, change, context);
     }
 
     nextVnode.onUpdate(model);
@@ -231,11 +223,10 @@ function updateThunk(
     prevVnode: ThunkVnode,
     nextVnode: ThunkVnode,
     path: string,
-    dispatch: any,
     context: any
     ): Node {
     const { props, children } = nextVnode;
-    const model = { children, props, path, dispatch, context };
+    const model = { children, props, path, context };
     const outputVnode = nextVnode.render(model);
     const changes = diffVnodes(
         prevVnode.state.vnode,
@@ -244,7 +235,7 @@ function updateThunk(
     );
 
     for (let change of changes) {
-        DOMNode = update(DOMNode, change, dispatch, context);
+        DOMNode = update(DOMNode, change, context);
     }
 
     nextVnode.state = {

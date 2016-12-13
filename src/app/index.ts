@@ -14,12 +14,12 @@ import {
     isNil
 } from 'utils';
 
-export function create(container: HTMLElement, dispatch?, rootId = '0') {
+export function create(container: HTMLElement, rootId = '0') {
     let prevVnode: Vnode;
     let DOMNode: Node;
 
     function create(vnode: Vnode, context: any): Node {
-        DOMNode = createDOM(vnode, rootId, dispatch, context);
+        DOMNode = createDOM(vnode, rootId, context);
         container.appendChild(DOMNode);
         prevVnode = vnode;
 
@@ -30,7 +30,7 @@ export function create(container: HTMLElement, dispatch?, rootId = '0') {
         const changes = diffVnodes(prevVnode, nextVnode, rootId);
 
         for (let change of changes) {
-            DOMNode = updateDOM(DOMNode, change, dispatch, context);
+            DOMNode = updateDOM(DOMNode, change, context);
         }
 
         prevVnode = nextVnode;

@@ -45,7 +45,6 @@ const DOMNodeFactory = createDOMNodeFactory();
 function createNative(
     vnode: NativeVnode,
     path: string,
-    dispatch: any,
     context: any
     ): Node {
     const { tagName, attributes, children } = vnode;
@@ -65,7 +64,7 @@ function createNative(
     for (let index = 0; index < length; index++) {
         const childVnode = children[ index ];
         const childPath = concatPaths(path, childVnode, index);
-        const childNode = create(childVnode, childPath, dispatch, context);
+        const childNode = create(childVnode, childPath, context);
 
         DOMNode.appendChild(childNode);
     }
@@ -77,14 +76,13 @@ function createNative(
 function createComponent(
     vnode: ComponentVnode,
     path: string,
-    dispatch: any,
     context: any
     ): Node {
     const { props, children } = vnode;
-    const model = { children, props, path, dispatch, context };
+    const model = { children, props, path, context };
     const outputVnode = vnode.render(model);
     const outputPath = concatPaths(path, outputVnode, 0);
-    const DOMNode = create(outputVnode, outputPath, dispatch, context);
+    const DOMNode = create(outputVnode, outputPath, context);
 
     vnode.onMount(model);
     vnode.state = {
@@ -99,14 +97,13 @@ function createComponent(
 function createThunk(
     vnode: ThunkVnode,
     path: string,
-    dispatch: any,
     context: any
     ): Node {
     const { props, children } = vnode;
-    const model = { children, props, path, dispatch, context };
+    const model = { children, props, path, context };
     const outputVnode = vnode.render(model);
     const outputPath = concatPaths(path, outputVnode, 0);
-    const DOMNode = create(outputVnode, outputPath, dispatch, context);
+    const DOMNode = create(outputVnode, outputPath, context);
 
     vnode.state = {
         vnode: outputVnode
@@ -124,20 +121,19 @@ function createText(text: string): Text {
 export function create(
     vnode: Vnode,
     path: string,
-    dispatch: any,
     context: any
     ): Node {
     switch (vnode.type) {
         case NATIVE: {
-            return createNative(vnode, path, dispatch, context);
+            return createNative(vnode, path, context);
         }
 
         case COMPONENT: {
-            return createComponent(vnode, path, dispatch, context);
+            return createComponent(vnode, path, context);
         }
 
         case THUNK: {
-            return createThunk(vnode, path, dispatch, context);
+            return createThunk(vnode, path, context);
         }
 
         case TEXT: {
