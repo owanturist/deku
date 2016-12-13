@@ -12,20 +12,20 @@ export type Key
 export type Props = {};
 
 export type Attributes = Props & {
-    key?: Key
+    readonly key?: Key
 }
 
 export type Model = {
-    children: Vnode[],
-    props: Props,
-    path: string,
-    dispatch: any,
-    context: any
+    readonly children: Vnode[],
+    readonly props: Props,
+    readonly path: string,
+    readonly dispatch: any,
+    readonly context: any
 }
 
 export type State = {
-    vnode: Vnode,
-    model: Model
+    readonly vnode: Vnode,
+    readonly model: Model
 }
 
 export type Render = (model: Model) => Vnode
@@ -33,19 +33,14 @@ export type Render = (model: Model) => Vnode
 export type Hook = (model: Model) => void
 
 export type Lifecycle = {
-    onMount: Hook,
-    onUpdate: Hook,
-    onUnmount: Hook
+    readonly onMount: Hook,
+    readonly onUpdate: Hook,
+    readonly onUnmount: Hook
 }
 
 export type Component = Lifecycle & {
-    render: Render
+    readonly render: Render
 }
-
-export type Config
-    = string
-    | Render
-    | Component
 
 type Child
     = null
@@ -58,9 +53,9 @@ type Child
 interface ArrayOfChildren extends Array<Child> {}
 
 export type KeyPatching = {
-    vnode: Vnode,
-    position: number,
-    key: Key
+    readonly vnode: Vnode,
+    readonly position: number,
+    readonly key: Key
 }
 
 export type Vnode
@@ -73,11 +68,11 @@ export type Vnode
 export type NATIVE = 'VNODE/NATIVE';
 export const NATIVE: NATIVE = 'VNODE/NATIVE';
 export type Native = {
-    type: NATIVE,
-    tagName: string,
-    attributes: Attributes,
-    children: Vnode[],
-    key: Key
+    readonly type: NATIVE,
+    readonly tagName: string,
+    readonly attributes: Attributes,
+    readonly children: Vnode[],
+    readonly key: Key
 }
 
 export function createNative(
@@ -107,11 +102,11 @@ export function isNative(vnode: Vnode): vnode is Native {
 export type THUNK = 'VNODE/THUNK';
 export const THUNK: THUNK = 'VNODE/THUNK';
 export type Thunk = Lifecycle & {
-    type: THUNK,
-    render: Render,
-    props: Props,
-    children: Vnode[],
-    key: Key,
+    readonly type: THUNK,
+    readonly render: Render,
+    readonly props: Props,
+    readonly children: Vnode[],
+    readonly key: Key,
     state?: State
 }
 
@@ -148,8 +143,8 @@ export function isThunk(vnode: Vnode): vnode is Thunk {
 export type TEXT = 'VNODE/TEXT';
 export const TEXT: TEXT = 'VNODE/TEXT';
 export type Text = {
-    type: TEXT,
-    text: string
+    readonly type: TEXT,
+    readonly text: string
 }
 
 export function createText(text: string): Text {
@@ -167,7 +162,7 @@ export function isSameText(leftVnode: Text, rightVnode: Text): boolean {
 export type EMPTY = 'VNODE/EMPTY';
 export const EMPTY: EMPTY = 'VNODE/EMPTY';
 export type Empty = {
-    type: EMPTY
+    readonly type: EMPTY
 }
 
 export function createEmpty(): Empty {
@@ -176,9 +171,8 @@ export function createEmpty(): Empty {
     };
 }
 
-
 export function create(
-    config: Config,
+    config: string | Render | Component,
     attributes?: Attributes,
     ...children: Child[]
     ): Vnode {
