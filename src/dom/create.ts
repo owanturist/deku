@@ -3,11 +3,13 @@ import {
 } from 'utils';
 import {
     NATIVE,
+    COMPONENT,
     THUNK,
     TEXT,
     EMPTY,
     Vnode,
     Native as NativeVnode,
+    Component as ComponentVnode,
     Thunk as ThunkVnode,
     concatPaths
 } from 'vnode';
@@ -71,8 +73,9 @@ function createNative(
     return DOMNode;
 }
 
-function createThunk(
-    vnode: ThunkVnode,
+
+function createComponent(
+    vnode: ComponentVnode,
     path: string,
     dispatch: any,
     context: any
@@ -93,6 +96,26 @@ function createThunk(
 }
 
 
+function createThunk(
+    vnode: ThunkVnode,
+    path: string,
+    dispatch: any,
+    context: any
+    ): Node {
+    const { props, children } = vnode;
+    const model = { children, props, path, dispatch, context };
+    const outputVnode = vnode.render(model);
+    const outputPath = concatPaths(path, outputVnode, 0);
+    const DOMNode = create(outputVnode, outputPath, dispatch, context);
+
+    vnode.state = {
+        vnode: outputVnode
+    };
+
+    return DOMNode;
+}
+
+
 function createText(text: string): Text {
     return document.createTextNode(text);
 }
@@ -107,6 +130,10 @@ export function create(
     switch (vnode.type) {
         case NATIVE: {
             return createNative(vnode, path, dispatch, context);
+        }
+
+        case COMPONENT: {
+            return createComponent(vnode, path, dispatch, context);
         }
 
         case THUNK: {

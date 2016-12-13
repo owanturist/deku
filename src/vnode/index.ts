@@ -23,23 +23,15 @@ export type Model = {
     readonly context: any
 }
 
-export type State = {
-    readonly vnode: Vnode,
-    readonly model: Model
-}
-
 export type Render = (model: Model) => Vnode
 
 export type Hook = (model: Model) => void
 
-export type Lifecycle = {
-    readonly onMount: Hook,
-    readonly onUpdate: Hook,
-    readonly onUnmount: Hook
-}
-
-export type Component = Lifecycle & {
-    readonly render: Render
+export type Lifecircle = {
+    readonly render: Render,
+    readonly onMount?: Hook,
+    readonly onUpdate?: Hook,
+    readonly onUnmount?: Hook
 }
 
 type Child
@@ -60,6 +52,7 @@ export type KeyPatching = {
 
 export type Vnode
     = Native
+    | Component
     | Thunk
     | Text
     | Empty
@@ -72,14 +65,14 @@ export type Native = {
     readonly tagName: string,
     readonly attributes: Attributes,
     readonly children: Vnode[],
-    readonly key: Key
+    readonly key?: Key
 }
 
 export function createNative(
     tagName: string,
     attributes: Attributes,
     children: Vnode[],
-    key: Key
+    key?: Key
     ): Native {
     return {
         type: NATIVE,
@@ -94,49 +87,80 @@ export function isSameNative(leftVnode: Native, rightVnode: Native): boolean {
     return leftVnode.tagName === rightVnode.tagName;
 }
 
-export function isNative(vnode: Vnode): vnode is Native {
-    return vnode.type === NATIVE;
+
+export type COMPONENT = 'VNODE/COMPONENT';
+export const COMPONENT: COMPONENT = 'VNODE/COMPONENT';
+export type Component = {
+    readonly type: COMPONENT,
+    readonly render: Render,
+    readonly onMount: Hook,
+    readonly onUpdate: Hook,
+    readonly onUnmount: Hook,
+    readonly props: Props,
+    readonly children: Vnode[],
+    readonly key?: Key,
+    state?: {
+        readonly vnode: Vnode,
+        readonly model: Model
+    }
+};
+
+export function createComponent(
+    component: Lifecircle,
+    props: Props,
+    children: Vnode[],
+    key?: Key
+    ): Component {
+    return {
+        type: COMPONENT,
+        render: component.render,
+        onMount: component.onMount || noop,
+        onUpdate: component.onUpdate || noop,
+        onUnmount: component.onUnmount || noop,
+        props,
+        children,
+        key
+    };
+}
+
+export function isSameComponent(
+    leftVnode: Component,
+    rightVnode: Component
+    ): boolean {
+    return leftVnode.render === rightVnode.render;
 }
 
 
 export type THUNK = 'VNODE/THUNK';
 export const THUNK: THUNK = 'VNODE/THUNK';
-export type Thunk = Lifecycle & {
+export type Thunk = {
     readonly type: THUNK,
     readonly render: Render,
     readonly props: Props,
     readonly children: Vnode[],
-    readonly key: Key,
-    state?: State
+    readonly key?: Key,
+    state?: {
+        readonly vnode: Vnode
+    }
 }
 
 export function createThunk(
     render: Render,
     props: Props,
     children: Vnode[],
-    key: Key,
-    onMount: Hook = noop,
-    onUpdate: Hook = noop,
-    onUnmount: Hook = noop
+    key?: Key
     ): Thunk {
     return {
         type: THUNK,
         render,
         props,
         children,
-        key,
-        onMount,
-        onUpdate,
-        onUnmount
+        key
     };
 }
 
 export function isSameThunk(leftVnode: Thunk, rightVnode: Thunk): boolean {
     return leftVnode.render === rightVnode.render;
-}
-
-export function isThunk(vnode: Vnode): vnode is Thunk {
-    return vnode.type === THUNK;
 }
 
 
@@ -172,7 +196,7 @@ export function createEmpty(): Empty {
 }
 
 export function create(
-    config: string | Render | Component,
+    config: string | Render | Lifecircle,
     attributes?: Attributes,
     ...children: Child[]
     ): Vnode {
@@ -209,14 +233,11 @@ export function create(
         }
 
         case 'object': {
-            return createThunk(
-                (config as Component).render,
+            return createComponent(
+                (config as Lifecircle),
                 attributes,
                 vnodeChildren,
-                key,
-                (config as Component).onMount,
-                (config as Component).onUpdate,
-                (config as Component).onUnmount
+                key
             );
         }
 

@@ -15,14 +15,17 @@ import {
     REPLACE_NODE,
     REMOVE_NODE,
     UPDATE_THUNK,
+    UPDATE_COMPONENT,
     Change
 } from 'diff/changes';
 import {
     concatKeys,
     Vnode,
-    Thunk as ThunkVnode,
-    isThunk as isThunkVnode,
-    isNative as isNativeVnode
+    NATIVE,
+    COMPONENT,
+    THUNK,
+    Component as ComponentVnode,
+    Thunk as ThunkVnode
 } from 'vnode';
 import {
     set as setAttribute,
@@ -83,12 +86,12 @@ export function update(
 
             DOMNode.parentNode.replaceChild(newDOMNode, DOMNode);
             DOMNode = newDOMNode;
-            removeThunks(change.payload.prevVnode);
+            removeThunksAndComponents(change.payload.prevVnode);
             break;
         }
 
         case REMOVE_NODE: {
-            removeThunks(change.payload);
+            removeThunksAndComponents(change.payload);
             DOMNode.parentNode.removeChild(DOMNode);
             DOMNode = null;
             break;
@@ -96,6 +99,18 @@ export function update(
 
         case UPDATE_THUNK: {
             updateThunk(
+                DOMNode,
+                change.payload.prevThunk,
+                change.payload.nextThunk,
+                change.payload.path,
+                dispatch,
+                context
+            );
+            break;
+        }
+
+        case UPDATE_COMPONENT: {
+            updateComponent(
                 DOMNode,
                 change.payload.prevThunk,
                 change.payload.nextThunk,
@@ -180,10 +195,10 @@ function updateChildren(
 }
 
 
-function updateThunk(
+function updateComponent(
     DOMNode: Node,
-    prevVnode: ThunkVnode,
-    nextVnode: ThunkVnode,
+    prevVnode: ComponentVnode,
+    nextVnode: ComponentVnode,
     path: string,
     dispatch: any,
     context: any
@@ -211,15 +226,59 @@ function updateThunk(
 }
 
 
-function removeThunks(vnode: Vnode): void {
-    while (isThunkVnode(vnode)) {
-        vnode.onUnmount(vnode.state.model);
-        vnode = vnode.state.vnode;
+function updateThunk(
+    DOMNode: Node,
+    prevVnode: ThunkVnode,
+    nextVnode: ThunkVnode,
+    path: string,
+    dispatch: any,
+    context: any
+    ): Node {
+    const { props, children } = nextVnode;
+    const model = { children, props, path, dispatch, context };
+    const outputVnode = nextVnode.render(model);
+    const changes = diffVnodes(
+        prevVnode.state.vnode,
+        outputVnode,
+        concatKeys(path, 0)
+    );
+
+    for (let change of changes) {
+        DOMNode = update(DOMNode, change, dispatch, context);
     }
 
-    if (isNativeVnode(vnode) && vnode.children.length !== 0) {
-        for (let child of vnode.children) {
-            removeThunks(child);
+    nextVnode.state = {
+        vnode: outputVnode
+    };
+
+    return DOMNode;
+}
+
+
+function removeThunksAndComponents(vnode: Vnode): void {
+    while (true) {
+        switch (vnode.type) {
+            case COMPONENT: {
+                vnode.onUnmount(vnode.state.model);
+                vnode = vnode.state.vnode;
+                continue;
+            }
+
+            case THUNK: {
+                vnode = vnode.state.vnode;
+                continue;
+            }
+
+            case NATIVE: {
+                for (let child of vnode.children) {
+                    removeThunksAndComponents(child);
+                }
+                return;
+            }
+
+            default: {
+                return;
+            }
         }
     }
 }
