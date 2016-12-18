@@ -1,5 +1,6 @@
 import {
     noop,
+    isUndefined,
     isNil,
     isNull
 } from 'utils';
@@ -207,14 +208,14 @@ export function create<P, C>(
     attributes?: Attributes<P>,
     ...children: Child<P, C>[]
     ): Vnode<P, C> {
-    let key: Key;
+    let key;
     const vnodeChildren = [];
 
     buildVnodeChildren<P, C>(vnodeChildren, children);
 
     if (isNil(attributes)) {
         attributes = {} as P;
-    } else if ('key' in attributes) {
+    } else if (!isUndefined(attributes.key)) {
         key = attributes.key;
 
         delete attributes.key;
@@ -375,7 +376,7 @@ export function buildKeyPatching<P, C>(
         return [];
     }
 
-    const result = [];
+    const result: KeyPatching<P, C>[] = [];
 
     for (let index = 0; index < length; index++) {
         result[ index ] = createKeyPatching(vnodes[ index ], index);

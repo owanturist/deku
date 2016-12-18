@@ -12,22 +12,24 @@ import {
     Vnode
 } from 'vnode';
 import {
-    isNil
+    isNull
 } from 'utils';
 
-export function create<P, C>(container: HTMLElement, rootId = '0') {
+export function create<P, C>(container: HTMLElement | null, rootId = '0') {
     let prevVnode: Vnode<P, C>;
-    let DOMNode: Node;
+    let DOMNode: Node | null = null;
 
-    function create(vnode: Vnode<P, C>, context: Context<C>): Node {
+    function createAppDOM(vnode: Vnode<P, C>, context: Context<C>): Node | null {
         DOMNode = createDOM(vnode, rootId, context);
-        container.appendChild(DOMNode);
+        if (!isNull(container)) {
+            container.appendChild(DOMNode);
+        }
         prevVnode = vnode;
 
         return DOMNode;
     }
 
-    function update(nextVnode: Vnode<P, C>, context: Context<C>): Node {
+    function updateAppDOM(nextVnode: Vnode<P, C>, context: Context<C>): Node | null {
         const changes = diffVnodes(prevVnode, nextVnode, rootId);
 
         for (let change of changes) {
@@ -39,9 +41,9 @@ export function create<P, C>(container: HTMLElement, rootId = '0') {
         return DOMNode;
     }
 
-    return (vnode: Vnode<P, C>, context?: Context<C>): Node => {
-        return isNil(DOMNode) ?
-            create(vnode, context) :
-            update(vnode, context);
+    return (vnode: Vnode<P, C>, context: Context<C>): Node | null => {
+        return isNull(DOMNode) ?
+            createAppDOM(vnode, context) :
+            updateAppDOM(vnode, context);
     };
 }

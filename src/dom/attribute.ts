@@ -1,4 +1,5 @@
 import {
+    isNull,
     isString,
     isFunction
 } from 'utils';
@@ -43,12 +44,12 @@ function isInputWithArea(type: string): boolean {
 
 
 export function set(
-    DOMNode: Node,
+    DOMNode: Node | null,
     attribute: string,
     nextValue: any,
     prevValue?: any
     ): void {
-    if (nextValue === prevValue) {
+    if (isNull(DOMNode) || nextValue === prevValue) {
         return;
     }
 
@@ -104,19 +105,22 @@ export function set(
         default: {
             if (DOMNode instanceof Element) {
                 DOMNode.setAttribute(attribute, nextValue);
-            } else if (DOMNode instanceof SVGElement) {
+            } else if (DOMNode instanceof SVGElement && !isNull(DOMNode.namespaceURI)) {
                 DOMNode.setAttributeNS(DOMNode.namespaceURI, attribute, nextValue);
             }
         }
     }
 }
 
-
 export function remove(
-    DOMNode: Node,
+    DOMNode: Node | null,
     attribute: string,
     prevValue?: any
     ): void {
+    if (isNull(DOMNode)) {
+        return;
+    }
+
     const eventType = getEventByAttribute(attribute);
 
     if (isString(eventType) && isFunction(prevValue)) {

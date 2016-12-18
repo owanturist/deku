@@ -125,7 +125,7 @@ export function diffAttributes<P, C>(
     ): Change<P, C>[] {
     const prevAttrs = prevVnode.attributes;
     const nextAttrs = nextVnode.attributes;
-    const changes = [];
+    const changes: Change<P, C>[] = [];
 
     for (let name in nextAttrs) {
         if (nextAttrs[ name ] !== prevAttrs[ name ]) {
@@ -154,7 +154,7 @@ export function diffChildren<P, C>(
     ): UpdateChildren<P, C> {
     const prevChildren = prevVnode.children;
     const nextChildren = nextVnode.children;
-    const changes = [];
+    const changes: Change<P, C>[] = [];
 
     dift(
         buildKeyPatching(prevChildren),
@@ -162,8 +162,8 @@ export function diffChildren<P, C>(
         (
             type: number,
             prev: KeyPatching<P, C>,
-            next?: KeyPatching<P, C>,
-            position?: number
+            next: KeyPatching<P, C>,
+            position: number
         ): void => {
             switch (type) {
                 case CREATE: {

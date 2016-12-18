@@ -1,5 +1,6 @@
 import {
-    isUndefined
+    isUndefined,
+    isNull
 } from 'utils';
 import {
     diffVnodes
@@ -38,10 +39,10 @@ import {
 
 
 export function update<P, C>(
-    DOMNode: Node,
+    DOMNode: Node | null,
     change: Change<P, C>,
     context: Context<C>
-    ): Node {
+    ): Node | null {
     switch (change.type) {
         case SET_ATTRIBUTE: {
             setAttribute(
@@ -68,31 +69,37 @@ export function update<P, C>(
         }
 
         case INSERT_BEFORE: {
-            insertAtPosition(
-                DOMNode.parentNode,
-                change.payload,
-                DOMNode
-            );
+            if (!isNull(DOMNode)) {
+                insertAtPosition(
+                    DOMNode.parentNode,
+                    change.payload,
+                    DOMNode
+                );
+            }
             break;
         }
 
         case REPLACE_NODE: {
-            const newDOMNode = create(
-                change.payload.nextVnode,
-                change.payload.path,
-                context
-            );
+            if (!isNull(DOMNode) && !isNull(DOMNode.parentNode)) {
+                const newDOMNode = create(
+                    change.payload.nextVnode,
+                    change.payload.path,
+                    context
+                );
 
-            DOMNode.parentNode.replaceChild(newDOMNode, DOMNode);
-            DOMNode = newDOMNode;
-            removeThunksAndComponents(change.payload.prevVnode);
+                DOMNode.parentNode.replaceChild(newDOMNode, DOMNode);
+                DOMNode = newDOMNode;
+                removeThunksAndComponents(change.payload.prevVnode);
+            }
             break;
         }
 
         case REMOVE_NODE: {
-            removeThunksAndComponents(change.payload);
-            DOMNode.parentNode.removeChild(DOMNode);
-            DOMNode = null;
+            if (!isNull(DOMNode) && !isNull(DOMNode.parentNode)) {
+                removeThunksAndComponents(change.payload);
+                DOMNode.parentNode.removeChild(DOMNode);
+                return null;
+            }
             break;
         }
 
@@ -128,20 +135,20 @@ export function update<P, C>(
 
 
 function updateChildren<P, C>(
-    DOMNode: Node,
+    DOMNode: Node | null,
     changes: Change<P, C>[],
     context: Context<C>
     ): void {
     let childNodes: Node[];
 
-    function getChildNode(position: number): Node {
+    function getChildNode(node: Node, position: number): Node {
         if (isUndefined(childNodes)) {
             childNodes = [];
 
-            const { length } = DOMNode.childNodes;
+            const { length } = node.childNodes;
 
             for (let index = 0; index < length; index++) {
-                childNodes[ index ] = DOMNode.childNodes.item(index);
+                childNodes[ index ] = node.childNodes.item(index);
             }
         }
 
@@ -164,19 +171,23 @@ function updateChildren<P, C>(
             }
 
             case REMOVE_CHILD: {
-                DOMNode.removeChild(
-                    getChildNode(change.payload)
-                );
+                if (!isNull(DOMNode)) {
+                    DOMNode.removeChild(
+                        getChildNode(DOMNode, change.payload)
+                    );
+                }
                 break;
             }
 
             case UPDATE_CHILD: {
-                for (let subChange of change.payload.changes) {
-                    update(
-                        getChildNode(change.payload.position),
-                        subChange,
-                        context
-                    );
+                if (!isNull(DOMNode)) {
+                    for (let subChange of change.payload.changes) {
+                        update(
+                            getChildNode(DOMNode, change.payload.position),
+                            subChange,
+                            context
+                        );
+                    }
                 }
                 break;
             }
@@ -190,16 +201,16 @@ function updateChildren<P, C>(
 
 
 function updateComponent<P, C>(
-    DOMNode: Node,
+    DOMNode: Node | null,
     prevVnode: ComponentVnode<P, C>,
     nextVnode: ComponentVnode<P, C>,
     path: string,
     context: Context<C>
-    ): Node {
+    ): Node | null {
     const { props, children } = nextVnode;
     const model = { children, props, path, context };
     const outputVnode = nextVnode.render(model);
-    const changes = diffVnodes(
+    const changes = isUndefined(prevVnode.state) ? [] : diffVnodes(
         prevVnode.state.vnode,
         outputVnode,
         concatKeys(path, 0)
@@ -220,16 +231,16 @@ function updateComponent<P, C>(
 
 
 function updateThunk<P, C>(
-    DOMNode: Node,
+    DOMNode: Node | null,
     prevVnode: ThunkVnode<P, C>,
     nextVnode: ThunkVnode<P, C>,
     path: string,
     context: Context<C>
-    ): Node {
+    ): Node | null {
     const { props, children } = nextVnode;
     const model = { children, props, path, context };
     const outputVnode = nextVnode.render(model);
-    const changes = diffVnodes(
+    const changes = isUndefined(prevVnode.state) ? [] : diffVnodes(
         prevVnode.state.vnode,
         outputVnode,
         concatKeys(path, 0)
@@ -251,13 +262,17 @@ function removeThunksAndComponents<C, P>(vnode: Vnode<C, P>): void {
     while (true) {
         switch (vnode.type) {
             case COMPONENT: {
-                vnode.onUnmount(vnode.state.model);
-                vnode = vnode.state.vnode;
+                if (!isUndefined(vnode.state)) {
+                    vnode.onUnmount(vnode.state.model);
+                    vnode = vnode.state.vnode;
+                }
                 continue;
             }
 
             case THUNK: {
-                vnode = vnode.state.vnode;
+                if (!isUndefined(vnode.state)) {
+                    vnode = vnode.state.vnode;
+                }
                 continue;
             }
 
@@ -277,15 +292,19 @@ function removeThunksAndComponents<C, P>(vnode: Vnode<C, P>): void {
 
 
 function insertAtPosition(
-    parentDOMNode: Node,
+    parentDOMNode: Node | null,
     position: number,
-    DOMNode: Node
+    DOMNode: Node | null
     ): void {
+    if (isNull(parentDOMNode) || isNull(DOMNode)) {
+        return;
+    }
+
     const refDOMNode = parentDOMNode.childNodes.item(position);
 
-    if (refDOMNode) {
-        parentDOMNode.insertBefore(DOMNode, refDOMNode);
-    } else {
+    if (isNull(refDOMNode)) {
         parentDOMNode.appendChild(DOMNode);
+    } else {
+        parentDOMNode.insertBefore(DOMNode, refDOMNode);
     }
 }
