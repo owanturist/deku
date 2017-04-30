@@ -109,10 +109,7 @@ describe('Element', () => {
                 render: Thunk,
                 props: {},
                 children: [],
-                key: undefined,
-                onMount: noop,
-                onUnmount: noop,
-                onUpdate: noop
+                key: undefined
             });
         });
 
@@ -124,10 +121,7 @@ describe('Element', () => {
                 render: Thunk,
                 props: {},
                 children: [],
-                key: 123,
-                onMount: noop,
-                onUnmount: noop,
-                onUpdate: noop
+                key: 123
             });
         });
 
@@ -142,10 +136,7 @@ describe('Element', () => {
                     bar: 123
                 },
                 children: [],
-                key: undefined,
-                onMount: noop,
-                onUnmount: noop,
-                onUpdate: noop
+                key: undefined
             });
         });
 
@@ -164,16 +155,10 @@ describe('Element', () => {
                         render: Thunk,
                         props: {},
                         children: [],
-                        key: 'child',
-                        onMount: noop,
-                        onUnmount: noop,
-                        onUpdate: noop
+                        key: 'child'
                     }
                 ],
-                key: 'parent',
-                onMount: noop,
-                onUnmount: noop,
-                onUpdate: noop
+                key: 'parent'
             });
         });
     });
