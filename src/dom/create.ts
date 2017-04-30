@@ -2,14 +2,8 @@ import {
     isUndefined
 } from 'utils';
 import {
-    Context,
-    NATIVE,
-    THUNK,
-    TEXT,
-    EMPTY,
     Vnode,
-    Native as NativeVnode,
-    Thunk as ThunkVnode,
+    Native,
     concatPaths
 } from 'vnode';
 import {
@@ -41,10 +35,9 @@ function createDOMNodeFactory() {
 const DOMNodeFactory = createDOMNodeFactory();
 
 
-function createNative<P, C>(
-    vnode: NativeVnode<P, C>,
+function createNative(
+    vnode: Native,
     path: string,
-    context: Context<C>
     ): Node {
     const { tagName, attributes, children } = vnode;
     const DOMNode = DOMNodeFactory(tagName);
@@ -62,30 +55,11 @@ function createNative<P, C>(
 
     for (let index = 0; index < length; index++) {
         const childVnode = children[ index ];
-        const childPath = concatPaths(path, childVnode, index);
-        const childNode = create(childVnode, childPath, context);
+        const childPath = concatPaths(path, index);
+        const childNode = create(childVnode, childPath);
 
         DOMNode.appendChild(childNode);
     }
-
-    return DOMNode;
-}
-
-
-function createThunk<P, C>(
-    vnode: ThunkVnode<P, C>,
-    path: string,
-    context: any
-    ): Node {
-    const { props, children } = vnode;
-    const model = { children, props, path, context };
-    const outputVnode = vnode.render(model);
-    const outputPath = concatPaths(path, outputVnode, 0);
-    const DOMNode = create(outputVnode, outputPath, context);
-
-    vnode.state = {
-        vnode: outputVnode
-    };
 
     return DOMNode;
 }
@@ -96,30 +70,17 @@ function createText(text: string): Text {
 }
 
 
-export function create<P, C>(
-    vnode: Vnode<P, C>,
-    path: string,
-    context: Context<C>
+export function create(
+    vnode: Vnode,
+    path: string
     ): Node {
     switch (vnode.type) {
-        case NATIVE: {
-            return createNative(vnode, path, context);
+        case 'NATIVE': {
+            return createNative(vnode, path);
         }
 
-        case THUNK: {
-            return createThunk(vnode, path, context);
-        }
-
-        case TEXT: {
+        case 'TEXT': {
             return createText(vnode.text);
-        }
-
-        case EMPTY: {
-            return DOMNodeFactory('noscript');
-        }
-
-        default: {
-            throw new Error('Vnode type is invalid.');
         }
     }
 }

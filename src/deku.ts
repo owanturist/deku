@@ -1,7 +1,2 @@
-import { create as createElement } from 'vnode';
-import { create as createApp } from 'app';
-
-export default {
-    createElement,
-    createApp
-};
+export { Native, Text } from 'vnode';
+export { create as createApp } from 'app';

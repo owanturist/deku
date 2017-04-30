@@ -6,25 +6,10 @@ import {
     diffVnodes
 } from 'diff';
 import {
-    SET_ATTRIBUTE,
-    REMOVE_ATTRIBUTE,
-    INSERT_CHILD,
-    REMOVE_CHILD,
-    UPDATE_CHILD,
-    UPDATE_CHILDREN,
-    INSERT_BEFORE,
-    REPLACE_NODE,
-    REMOVE_NODE,
-    UPDATE_THUNK,
     Change
 } from 'diff/changes';
 import {
-    Context,
-    concatKeys,
-    Vnode,
-    NATIVE,
-    THUNK,
-    Thunk as ThunkVnode
+    Vnode
 } from 'vnode';
 import {
     set as setAttribute,
@@ -35,84 +20,65 @@ import {
 } from './create';
 
 
-export function update<P, C>(
+export function update(
     DOMNode: Node | null,
-    change: Change<P, C>,
-    context: Context<C>
+    change: Change,
     ): Node | null {
     switch (change.type) {
-        case SET_ATTRIBUTE: {
+        case 'SET_ATTRIBUTE': {
             setAttribute(
                 DOMNode,
-                change.payload.attribute,
-                change.payload.nextValue,
-                change.payload.prevValue
+                change.attribute,
+                change.nextValue,
+                change.prevValue
             );
             break;
         }
 
-        case REMOVE_ATTRIBUTE: {
+        case 'REMOVE_ATTRIBUTE': {
             removeAttribute(
                 DOMNode,
-                change.payload.attribute,
-                change.payload.value
+                change.attribute,
+                change.value
             );
             break;
         }
 
-        case UPDATE_CHILDREN: {
-            updateChildren(DOMNode, change.payload, context);
+        case 'UPDATE_CHILDREN': {
+            updateChildren(DOMNode, change.changes);
             break;
         }
 
-        case INSERT_BEFORE: {
+        case 'INSERT_BEFORE': {
             if (!isNull(DOMNode)) {
                 insertAtPosition(
                     DOMNode.parentNode,
-                    change.payload,
+                    change.position,
                     DOMNode
                 );
             }
             break;
         }
 
-        case REPLACE_NODE: {
+        case 'REPLACE_NODE': {
             if (!isNull(DOMNode) && !isNull(DOMNode.parentNode)) {
                 const newDOMNode = create(
-                    change.payload.nextVnode,
-                    change.payload.path,
-                    context
+                    change.nextVnode,
+                    change.path
                 );
 
                 DOMNode.parentNode.replaceChild(newDOMNode, DOMNode);
                 DOMNode = newDOMNode;
-                removeThunksAndComponents(change.payload.prevVnode);
             }
             break;
         }
 
-        case REMOVE_NODE: {
+        case 'REMOVE_NODE': {
             if (!isNull(DOMNode) && !isNull(DOMNode.parentNode)) {
-                removeThunksAndComponents(change.payload);
                 DOMNode.parentNode.removeChild(DOMNode);
                 return null;
             }
             break;
-        }
-
-        case UPDATE_THUNK: {
-            updateThunk(
-                DOMNode,
-                change.payload.prevThunk,
-                change.payload.nextThunk,
-                change.payload.path,
-                context
-            );
-            break;
-        }
-
-        default: {
-            // do nothing
         }
     }
 
@@ -120,10 +86,9 @@ export function update<P, C>(
 }
 
 
-function updateChildren<P, C>(
+function updateChildren(
     DOMNode: Node | null,
-    changes: Change<P, C>[],
-    context: Context<C>
+    changes: Change[],
     ): void {
     let childNodes: Node[];
 
@@ -143,101 +108,38 @@ function updateChildren<P, C>(
 
     for (let change of changes) {
         switch (change.type) {
-            case INSERT_CHILD: {
+            case 'INSERT_CHILD': {
                 insertAtPosition(
                     DOMNode,
-                    change.payload.position,
-                    create(
-                        change.payload.vnode,
-                        change.payload.path,
-                        context
-                    )
+                    change.position,
+                    create(change.vnode, change.path)
                 );
                 break;
             }
 
-            case REMOVE_CHILD: {
+            case 'REMOVE_CHILD': {
                 if (!isNull(DOMNode)) {
                     DOMNode.removeChild(
-                        getChildNode(DOMNode, change.payload)
+                        getChildNode(DOMNode, change.position)
                     );
                 }
                 break;
             }
 
-            case UPDATE_CHILD: {
+            case 'UPDATE_CHILD': {
                 if (!isNull(DOMNode)) {
-                    for (let subChange of change.payload.changes) {
+                    for (let subChange of change.changes) {
                         update(
-                            getChildNode(DOMNode, change.payload.position),
-                            subChange,
-                            context
+                            getChildNode(DOMNode, change.position),
+                            subChange
                         );
                     }
                 }
                 break;
             }
-
-            default: {
-                // do nothing
-            }
         }
     }
 }
-
-
-function updateThunk<P, C>(
-    DOMNode: Node | null,
-    prevVnode: ThunkVnode<P, C>,
-    nextVnode: ThunkVnode<P, C>,
-    path: string,
-    context: Context<C>
-    ): Node | null {
-    const { props, children } = nextVnode;
-    const model = { children, props, path, context };
-    const outputVnode = nextVnode.render(model);
-    const changes = isUndefined(prevVnode.state) ? [] : diffVnodes(
-        prevVnode.state.vnode,
-        outputVnode,
-        concatKeys(path, 0)
-    );
-
-    for (let change of changes) {
-        DOMNode = update(DOMNode, change, context);
-    }
-
-    nextVnode.state = {
-        vnode: outputVnode
-    };
-
-    return DOMNode;
-}
-
-
-function removeThunksAndComponents<C, P>(vnode: Vnode<C, P>): void {
-    while (true) {
-        switch (vnode.type) {
-            case THUNK: {
-                if (!isUndefined(vnode.state)) {
-                    vnode = vnode.state.vnode;
-                }
-                continue;
-            }
-
-            case NATIVE: {
-                for (let child of vnode.children) {
-                    removeThunksAndComponents(child);
-                }
-                return;
-            }
-
-            default: {
-                return;
-            }
-        }
-    }
-}
-
 
 function insertAtPosition(
     parentDOMNode: Node | null,

@@ -4,45 +4,38 @@ import {
     isUndefined
 } from 'utils';
 import {
-    NATIVE,
-    THUNK,
-    TEXT,
     Vnode,
-    Native as NativeVnode,
-    Thunk as ThunkVnode,
-    Text as TextVnode,
-    isSameNative as isSameNativeVnodes,
-    isSameThunk as isSameThunkVnodes,
-    isSameText as isSameTextVnodes,
+    Native,
+    Text,
+    isSameNative,
+    isSameText,
     KeyPatching,
+    buildKeyPatchings,
     getKey,
-    concatKeys,
-    buildKeyPatching
+    concatPaths
 } from 'vnode';
 import {
     Change,
+    SetAttribute,
+    RemoveAttribute,
+    InsertChild,
+    RemoveChild,
     UpdateChildren,
-    setAttribute,
-    removeAttribute,
-    insertChild,
-    removeChild,
-    updateChildren,
-    insertBefore,
-    replaceNode,
-    removeNode,
-    updateChild,
-    updateThunk
+    InsertBefore,
+    ReplaceNode,
+    RemoveNode,
+    UpdateChild
 } from './changes';
 
 
-export function diffVnodes<P, C>(
-    prevVnode: Vnode<P, C>,
-    nextVnode: Vnode<P, C> | undefined,
+export function diffVnodes(
+    prevVnode: Vnode,
+    nextVnode: Vnode | undefined,
     path: string
-    ): Change<P, C>[] {
+    ): Change[] {
     if (isUndefined(nextVnode)) {
         return [
-            removeNode(prevVnode)
+            RemoveNode(prevVnode)
         ];
     }
 
@@ -52,17 +45,17 @@ export function diffVnodes<P, C>(
 
     if (prevVnode.type !== nextVnode.type) {
         return [
-            replaceNode(prevVnode, nextVnode, path)
+            ReplaceNode(prevVnode, nextVnode, path)
         ];
     }
 
     switch (nextVnode.type) {
-        case NATIVE: {
-            if (isSameNativeVnodes(prevVnode as NativeVnode<P, C>, nextVnode)) {
-                const changes = diffAttributes(prevVnode as NativeVnode<P, C>, nextVnode);
-                const childChanges = diffChildren(prevVnode as NativeVnode<P, C>, nextVnode, path);
+        case 'NATIVE': {
+            if (isSameNative(prevVnode as Native, nextVnode)) {
+                const changes = diffAttributes(prevVnode as Native, nextVnode);
+                const childChanges = diffChildren(prevVnode as Native, nextVnode, path);
 
-                if (childChanges.payload.length !== 0) {
+                if (childChanges.changes.length !== 0) {
                     changes.push(childChanges);
                 }
 
@@ -70,51 +63,35 @@ export function diffVnodes<P, C>(
             }
 
             return [
-                replaceNode(prevVnode, nextVnode, path)
+                ReplaceNode(prevVnode, nextVnode, path)
             ];
         }
 
-        case THUNK: {
-            if (isSameThunkVnodes(prevVnode as ThunkVnode<P, C>, nextVnode)) {
-                return [
-                    updateThunk(prevVnode as ThunkVnode<P, C>, nextVnode, path)
-                ];
-            }
-
-            return [
-                replaceNode(prevVnode, nextVnode, path)
-            ];
-        }
-
-        case TEXT: {
-            if (isSameTextVnodes(prevVnode as TextVnode, nextVnode)) {
+        case 'TEXT': {
+            if (isSameText(prevVnode as Text, nextVnode)) {
                 return [];
             }
 
             return [
-                setAttribute('nodeValue', nextVnode.text, (prevVnode as TextVnode).text)
+                SetAttribute('nodeValue', nextVnode.text, (prevVnode as Text).text)
             ];
-        }
-
-        default: {
-            return [];
         }
     }
 }
 
 
-export function diffAttributes<P, C>(
-    prevVnode: NativeVnode<P, C>,
-    nextVnode: NativeVnode<P, C>
-    ): Change<P, C>[] {
+export function diffAttributes(
+    prevVnode: Native,
+    nextVnode: Native
+    ): Change[] {
     const prevAttrs = prevVnode.attributes;
     const nextAttrs = nextVnode.attributes;
-    const changes: Change<P, C>[] = [];
+    const changes: Change[] = [];
 
     for (let name in nextAttrs) {
         if (nextAttrs[ name ] !== prevAttrs[ name ]) {
             changes.push(
-                setAttribute(name, nextAttrs[ name ], prevAttrs[ name ])
+                SetAttribute(name, nextAttrs[ name ], prevAttrs[ name ])
             );
         }
     }
@@ -122,7 +99,7 @@ export function diffAttributes<P, C>(
     for (let name in prevAttrs) {
         if (!nextAttrs.hasOwnProperty(name)) {
             changes.push(
-                removeAttribute(name, prevAttrs[ name ])
+                RemoveAttribute(name, prevAttrs[ name ])
             );
         }
     }
@@ -131,31 +108,31 @@ export function diffAttributes<P, C>(
 }
 
 
-export function diffChildren<P, C>(
-    prevVnode: NativeVnode<P, C>,
-    nextVnode: NativeVnode<P, C>,
+export function diffChildren(
+    prevVnode: Native,
+    nextVnode: Native,
     parentPath: string
-    ): UpdateChildren<P, C> {
+    ): UpdateChildren {
     const prevChildren = prevVnode.children;
     const nextChildren = nextVnode.children;
-    const changes: Change<P, C>[] = [];
+    const changes: Change[] = [];
 
     dift(
-        buildKeyPatching(prevChildren),
-        buildKeyPatching(nextChildren),
+        buildKeyPatchings(prevChildren),
+        buildKeyPatchings(nextChildren),
         (
             type: number,
-            prev: KeyPatching<P, C>,
-            next: KeyPatching<P, C>,
+            prev: KeyPatching,
+            next: KeyPatching,
             position: number
         ): void => {
             switch (type) {
                 case CREATE: {
                     changes.push(
-                        insertChild(
+                        InsertChild(
                             next.vnode,
                             position,
-                            concatKeys(parentPath, next.key)
+                            concatPaths(parentPath, next.key)
                         )
                     );
 
@@ -166,12 +143,12 @@ export function diffChildren<P, C>(
                     const childChanges = diffVnodes(
                         prev.vnode,
                         next.vnode,
-                        concatKeys(parentPath, next.key)
+                        concatPaths(parentPath, next.key)
                     );
 
                     if (childChanges.length !== 0) {
                         changes.push(
-                            updateChild(prev.position, childChanges)
+                            UpdateChild(prev.key, childChanges)
                         );
                     }
 
@@ -182,13 +159,13 @@ export function diffChildren<P, C>(
                     const childChanges = diffVnodes(
                         prev.vnode,
                         next.vnode,
-                        concatKeys(parentPath, next.key)
+                        concatPaths(parentPath, next.key)
                     );
                     childChanges.push(
-                        insertBefore(position)
+                        InsertBefore(position)
                     );
                     changes.push(
-                        updateChild(prev.position, childChanges)
+                        UpdateChild(prev.key, childChanges)
                     );
 
                     break;
@@ -196,7 +173,7 @@ export function diffChildren<P, C>(
 
                 case REMOVE: {
                     changes.push(
-                        removeChild(prev.position)
+                        RemoveChild(prev.key)
                     );
 
                     break;
@@ -210,6 +187,6 @@ export function diffChildren<P, C>(
         getKey
     );
 
-    return updateChildren<P, C>(changes);
+    return UpdateChildren(changes);
 }
 

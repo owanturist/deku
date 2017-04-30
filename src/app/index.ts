@@ -8,19 +8,18 @@ import {
     diffVnodes
 } from 'diff';
 import {
-    Context,
     Vnode
 } from 'vnode';
 import {
     isNull
 } from 'utils';
 
-export function create<P, C>(container: HTMLElement | null, rootId = '0') {
-    let prevVnode: Vnode<P, C>;
+export function create(container: HTMLElement | null, rootId = '0') {
+    let prevVnode: Vnode;
     let DOMNode: Node | null = null;
 
-    function createAppDOM(vnode: Vnode<P, C>, context: Context<C>): Node | null {
-        DOMNode = createDOM(vnode, rootId, context);
+    function createAppDOM(vnode: Vnode): Node | null {
+        DOMNode = createDOM(vnode, rootId);
         if (!isNull(container)) {
             container.appendChild(DOMNode);
         }
@@ -29,11 +28,11 @@ export function create<P, C>(container: HTMLElement | null, rootId = '0') {
         return DOMNode;
     }
 
-    function updateAppDOM(nextVnode: Vnode<P, C>, context: Context<C>): Node | null {
+    function updateAppDOM(nextVnode: Vnode): Node | null {
         const changes = diffVnodes(prevVnode, nextVnode, rootId);
 
         for (let change of changes) {
-            DOMNode = updateDOM(DOMNode, change, context);
+            DOMNode = updateDOM(DOMNode, change);
         }
 
         prevVnode = nextVnode;
@@ -41,9 +40,9 @@ export function create<P, C>(container: HTMLElement | null, rootId = '0') {
         return DOMNode;
     }
 
-    return (vnode: Vnode<P, C>, context: Context<C>): Node | null => {
+    return (vnode: Vnode): Node | null => {
         return isNull(DOMNode) ?
-            createAppDOM(vnode, context) :
-            updateAppDOM(vnode, context);
+            createAppDOM(vnode) :
+            updateAppDOM(vnode);
     };
 }
