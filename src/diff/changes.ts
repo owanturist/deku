@@ -1,6 +1,5 @@
 import {
     Vnode,
-    Component as ComponentVnode,
     Thunk as ThunkVnode
 } from 'vnode';
 
@@ -15,7 +14,6 @@ export type Change<P, C>
     | ReplaceNode<P, C>
     | RemoveNode<P, C>
     | UpdateThunk<P, C>
-    | UpdateComponent<P, C>
 
 export type SET_ATTRIBUTE = 'CHANGE/SET_ATTRIBUTE';
 export const SET_ATTRIBUTE: SET_ATTRIBUTE = 'CHANGE/SET_ATTRIBUTE';
@@ -214,29 +212,6 @@ export function updateThunk<P, C>(
     ): UpdateThunk<P, C> {
     return {
         type: UPDATE_THUNK,
-        payload: { prevThunk, nextThunk, path }
-    };
-}
-
-
-export type UPDATE_COMPONENT = 'CHANGE/UPDATE_COMPONENT';
-export const UPDATE_COMPONENT: UPDATE_COMPONENT = 'CHANGE/UPDATE_COMPONENT';
-export type UpdateComponent<P, C> = {
-    type: UPDATE_COMPONENT,
-    payload: {
-        prevThunk: ComponentVnode<P, C>,
-        nextThunk: ComponentVnode<P, C>,
-        path: string
-    }
-};
-
-export function updateComponent<P, C>(
-    prevThunk: ComponentVnode<P, C>,
-    nextThunk: ComponentVnode<P, C>,
-    path: string
-    ): UpdateComponent<P, C> {
-    return {
-        type: UPDATE_COMPONENT,
         payload: { prevThunk, nextThunk, path }
     };
 }

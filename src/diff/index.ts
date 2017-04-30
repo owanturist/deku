@@ -5,16 +5,13 @@ import {
 } from 'utils';
 import {
     NATIVE,
-    COMPONENT,
     THUNK,
     TEXT,
     Vnode,
     Native as NativeVnode,
-    Component as ComponentVnode,
     Thunk as ThunkVnode,
     Text as TextVnode,
     isSameNative as isSameNativeVnodes,
-    isSameComponent as isSameComponentVnodes,
     isSameThunk as isSameThunkVnodes,
     isSameText as isSameTextVnodes,
     KeyPatching,
@@ -34,8 +31,7 @@ import {
     replaceNode,
     removeNode,
     updateChild,
-    updateThunk,
-    updateComponent
+    updateThunk
 } from './changes';
 
 
@@ -71,18 +67,6 @@ export function diffVnodes<P, C>(
                 }
 
                 return changes;
-            }
-
-            return [
-                replaceNode(prevVnode, nextVnode, path)
-            ];
-        }
-
-        case COMPONENT: {
-            if (isSameComponentVnodes(prevVnode as ComponentVnode<P, C>, nextVnode)) {
-                return [
-                    updateComponent(prevVnode as ComponentVnode<P, C>, nextVnode, path)
-                ];
             }
 
             return [

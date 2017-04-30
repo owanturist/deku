@@ -4,13 +4,11 @@ import {
 import {
     Context,
     NATIVE,
-    COMPONENT,
     THUNK,
     TEXT,
     EMPTY,
     Vnode,
     Native as NativeVnode,
-    Component as ComponentVnode,
     Thunk as ThunkVnode,
     concatPaths
 } from 'vnode';
@@ -74,27 +72,6 @@ function createNative<P, C>(
 }
 
 
-function createComponent<P, C>(
-    vnode: ComponentVnode<P, C>,
-    path: string,
-    context: Context<C>
-    ): Node {
-    const { props, children } = vnode;
-    const model = { children, props, path, context };
-    const outputVnode = vnode.render(model);
-    const outputPath = concatPaths(path, outputVnode, 0);
-    const DOMNode = create(outputVnode, outputPath, context);
-
-    vnode.onMount(model);
-    vnode.state = {
-        vnode: outputVnode,
-        model
-    };
-
-    return DOMNode;
-}
-
-
 function createThunk<P, C>(
     vnode: ThunkVnode<P, C>,
     path: string,
@@ -127,10 +104,6 @@ export function create<P, C>(
     switch (vnode.type) {
         case NATIVE: {
             return createNative(vnode, path, context);
-        }
-
-        case COMPONENT: {
-            return createComponent(vnode, path, context);
         }
 
         case THUNK: {

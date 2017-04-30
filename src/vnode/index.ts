@@ -27,15 +27,6 @@ export type Model<P, C> = {
 
 export type Render<P, C> = (model: Model<P, C>) => Vnode<P, C>
 
-export type Hook<P, C> = (model: Model<P, C>) => void
-
-export type Lifecircle<P, C> = {
-    readonly render: Render<P, C>,
-    readonly onMount?: Hook<P, C>,
-    readonly onUpdate?: Hook<P, C>,
-    readonly onUnmount?: Hook<P, C>
-}
-
 type Child<P, C>
     = null
     | string
@@ -54,7 +45,6 @@ export type KeyPatching<P, C> = {
 
 export type Vnode<P, C>
     = Native<P, C>
-    | Component<P, C>
     | Thunk<P, C>
     | Text
     | Empty
@@ -90,49 +80,6 @@ export function isSameNative<P, C>(
     rightVnode: Native<P, C>
     ): boolean {
     return leftVnode.tagName === rightVnode.tagName;
-}
-
-
-export type COMPONENT = 'VNODE/COMPONENT';
-export const COMPONENT: COMPONENT = 'VNODE/COMPONENT';
-export type Component<P, C> = {
-    readonly type: COMPONENT,
-    readonly render: Render<P, C>,
-    readonly onMount: Hook<P, C>,
-    readonly onUpdate: Hook<P, C>,
-    readonly onUnmount: Hook<P, C>,
-    readonly props: Props<P>,
-    readonly children: Vnode<P, C>[],
-    readonly key?: Key,
-    state?: {
-        readonly vnode: Vnode<P, C>,
-        readonly model: Model<P, C>
-    }
-};
-
-export function createComponent<P, C>(
-    lifecircle: Lifecircle<P, C>,
-    props: Props<P>,
-    children: Vnode<P, C>[],
-    key?: Key
-    ): Component<P, C> {
-    return {
-        type: COMPONENT,
-        render: lifecircle.render,
-        onMount: lifecircle.onMount || noop,
-        onUpdate: lifecircle.onUpdate || noop,
-        onUnmount: lifecircle.onUnmount || noop,
-        props,
-        children,
-        key
-    };
-}
-
-export function isSameComponent<P, C>(
-    leftVnode: Component<P, C>,
-    rightVnode: Component<P, C>
-    ): boolean {
-    return leftVnode.render === rightVnode.render;
 }
 
 
@@ -204,7 +151,7 @@ export function createEmpty(): Empty {
 }
 
 export function create<P, C>(
-    config: string | Render<P, C> | Lifecircle<P, C>,
+    config: string | Render<P, C>,
     attributes?: Attributes<P>,
     ...children: Child<P, C>[]
     ): Vnode<P, C> {
@@ -234,15 +181,6 @@ export function create<P, C>(
         case 'function': {
             return createThunk<P, C>(
                 config as Render<P, C>,
-                attributes,
-                vnodeChildren,
-                key
-            );
-        }
-
-        case 'object': {
-            return createComponent<P, C>(
-                (config as Lifecircle<P, C>),
                 attributes,
                 vnodeChildren,
                 key
@@ -319,7 +257,6 @@ export function concatPaths<P, C>(
     ): string {
     switch (vnode.type) {
         case NATIVE:
-        case COMPONENT:
         case THUNK: {
             return concatKeys(path, vnode.key || fallback);
         }
@@ -342,7 +279,6 @@ export function createKeyPatching<P, C>(
     ): KeyPatching<P, C> {
     switch (vnode.type) {
         case NATIVE:
-        case COMPONENT:
         case THUNK: {
             return {
                 vnode,

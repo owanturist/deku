@@ -16,7 +16,6 @@ import {
     REPLACE_NODE,
     REMOVE_NODE,
     UPDATE_THUNK,
-    UPDATE_COMPONENT,
     Change
 } from 'diff/changes';
 import {
@@ -24,9 +23,7 @@ import {
     concatKeys,
     Vnode,
     NATIVE,
-    COMPONENT,
     THUNK,
-    Component as ComponentVnode,
     Thunk as ThunkVnode
 } from 'vnode';
 import {
@@ -114,17 +111,6 @@ export function update<P, C>(
             break;
         }
 
-        case UPDATE_COMPONENT: {
-            updateComponent(
-                DOMNode,
-                change.payload.prevThunk,
-                change.payload.nextThunk,
-                change.payload.path,
-                context
-            );
-            break;
-        }
-
         default: {
             // do nothing
         }
@@ -200,36 +186,6 @@ function updateChildren<P, C>(
 }
 
 
-function updateComponent<P, C>(
-    DOMNode: Node | null,
-    prevVnode: ComponentVnode<P, C>,
-    nextVnode: ComponentVnode<P, C>,
-    path: string,
-    context: Context<C>
-    ): Node | null {
-    const { props, children } = nextVnode;
-    const model = { children, props, path, context };
-    const outputVnode = nextVnode.render(model);
-    const changes = isUndefined(prevVnode.state) ? [] : diffVnodes(
-        prevVnode.state.vnode,
-        outputVnode,
-        concatKeys(path, 0)
-    );
-
-    for (let change of changes) {
-        DOMNode = update(DOMNode, change, context);
-    }
-
-    nextVnode.onUpdate(model);
-    nextVnode.state = {
-        vnode: outputVnode,
-        model
-    };
-
-    return DOMNode;
-}
-
-
 function updateThunk<P, C>(
     DOMNode: Node | null,
     prevVnode: ThunkVnode<P, C>,
@@ -261,14 +217,6 @@ function updateThunk<P, C>(
 function removeThunksAndComponents<C, P>(vnode: Vnode<C, P>): void {
     while (true) {
         switch (vnode.type) {
-            case COMPONENT: {
-                if (!isUndefined(vnode.state)) {
-                    vnode.onUnmount(vnode.state.model);
-                    vnode = vnode.state.vnode;
-                }
-                continue;
-            }
-
             case THUNK: {
                 if (!isUndefined(vnode.state)) {
                     vnode = vnode.state.vnode;
