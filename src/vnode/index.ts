@@ -15,7 +15,7 @@ export type Props<P> = {} & P;
 export type Context<C> = {} & C;
 
 export type Attributes<P> = Props<P> & {
-    readonly key?: Key
+    key?: Key
 }
 
 export type Model<P, C> = {
