@@ -39,7 +39,7 @@ describe('Element', () => {
                 Native('div', {}, [
                     Text('string '),
                     Native('span', {}, []),
-                    Text('string '),
+                    Text(' '),
                     Text('123')
                 ])
             ).toEqual({
