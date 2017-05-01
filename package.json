@@ -10,13 +10,14 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "build": "webpack",
-    "lint": "tslint \"src/**/**.ts*\""
+    "build:test": "tsc -p tsconfig.test.json",
+    "lint": "tslint \"src/**/**.ts*\"",
+    "pretest": "npm run clean && npm run build:test",
+    "test": "ava"
   },
   "devDependencies": {
-    "@types/jest": "^16.0.0",
+    "ava": "^0.19.1",
     "awesome-typescript-loader": "^3.0.0-beta.14",
-    "jest": "^17.0.3",
-    "ts-jest": "^17.0.0",
     "tslint": "^5.1.0",
     "typescript": "^2.1.4",
     "webpack": "^1.14.0"
@@ -33,34 +34,13 @@
     "elm",
     "redux"
   ],
-  "jest": {
-    "testRegex": "(/spec/.*|\\.spec)\\.ts(|x)$",
-    "testPathDirs": [
-      "src"
+  "ava": {
+    "files": [
+      "dist/**/*.spec.js"
     ],
-    "modulePaths": [
-      "src"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "tsx"
-    ],
-    "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "testResultsProcessor": "<rootDir>/node_modules/ts-jest/coverageprocessor.js",
-    "coverageReporters": [
-      "json",
-      "html",
-      "text"
-    ],
-    "coverageDirectory": "<rootDir>/coverage",
-    "coveragePathIgnorePatterns": [
-      "/node_modules/"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/"
+    "source": [
+      "dist/**/*.js",
+      "!dist/**/*.spec.js"
     ]
   }
 }

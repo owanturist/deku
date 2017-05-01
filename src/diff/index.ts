@@ -2,7 +2,7 @@ import dift, { CREATE, UPDATE, MOVE, REMOVE } from 'dift';
 
 import {
     isUndefined
-} from 'utils';
+} from '../utils';
 import {
     Vnode,
     Native,
@@ -13,7 +13,7 @@ import {
     buildKeyPatchings,
     getKey,
     concatPaths
-} from 'vnode';
+} from '../vnode';
 import {
     Change,
     SetAttribute,

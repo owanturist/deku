@@ -2,7 +2,7 @@ import {
     isNull,
     isString,
     isFunction
-} from 'utils';
+} from '../utils';
 
 import {
     getEventByAttribute

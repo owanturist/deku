@@ -1,10 +1,10 @@
 import {
     isUndefined,
     isNull
-} from 'utils';
+} from '../utils';
 import {
     Change
-} from 'diff/changes';
+} from '../diff/changes';
 import {
     set as setAttribute,
     remove as removeAttribute

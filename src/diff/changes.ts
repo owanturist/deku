@@ -1,6 +1,6 @@
 import {
     Vnode
-} from 'vnode';
+} from '../vnode';
 
 export type Change
     = SetAttribute

@@ -1,11 +1,11 @@
 import {
     isUndefined
-} from 'utils';
+} from '../utils';
 import {
     Vnode,
     Native,
     concatPaths
-} from 'vnode';
+} from '../vnode';
 import {
     set as setAttribute
 } from './attribute';

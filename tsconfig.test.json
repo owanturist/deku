@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "dist/tests",
     "module": "commonjs",
     "target": "es2015",
-    "sourceMap": true,
+    "baseUrl": "src",
+    "sourceMap": false,
     "inlineSourceMap": false,
     "inlineSources": false,
     "noImplicitAny": false,
@@ -12,9 +13,6 @@
     "moduleResolution": "node"
   },
   "include": [
-    "src/**/*"
-  ],
-  "exclude": [
     "src/**/*.spec.ts"
   ]
 }

@@ -1,18 +1,18 @@
 import {
     create as createDOM
-} from 'dom/create';
+} from '../dom/create';
 import {
     update as updateDOM
-} from 'dom/update';
+} from '../dom/update';
 import {
     diffVnodes
-} from 'diff';
+} from '../diff';
 import {
     Vnode
-} from 'vnode';
+} from '../vnode';
 import {
     isNull
-} from 'utils';
+} from '../utils';
 
 export function create(container: HTMLElement | null, rootId = '0') {
     let prevVnode: Vnode;
