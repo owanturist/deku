@@ -1,20 +1,18 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "./src/*",
-        "./test/*"
-      ]
-    },
+    "outDir": "dist",
+    "module": "commonjs",
+    "target": "es2015",
+    "baseUrl": "src",
     "sourceMap": true,
-    "target": "es5",
-    "jsx": "react",
-    "reactNamespace": "deku",
-    "strictNullChecks": true
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "noImplicitAny": false,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "moduleResolution": "node"
   },
-  "exclude": [
-    "node_modules"
+  "include": [
+    "src/**/*"
   ]
 }

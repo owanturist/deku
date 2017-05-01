@@ -31,7 +31,7 @@ export function create(container: HTMLElement | null, rootId = '0') {
     function updateAppDOM(nextVnode: Vnode): Node | null {
         const changes = diffVnodes(prevVnode, nextVnode, rootId);
 
-        for (let change of changes) {
+        for (const change of changes) {
             DOMNode = updateDOM(DOMNode, change);
         }
 

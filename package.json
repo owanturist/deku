@@ -7,16 +7,17 @@
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
   "scripts": {
-    "build": "./node_modules/.bin/webpack",
-    "test": "node_modules/.bin/jest",
-    "test:watch": "node_modules/.bin/jest --watch",
-    "test:coverage": "node_modules/.bin/jest --coverage"
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "build": "webpack",
+    "lint": "tslint \"src/**/**.ts*\""
   },
   "devDependencies": {
     "@types/jest": "^16.0.0",
     "awesome-typescript-loader": "^3.0.0-beta.14",
     "jest": "^17.0.3",
     "ts-jest": "^17.0.0",
+    "tslint": "^5.1.0",
     "typescript": "^2.1.4",
     "webpack": "^1.14.0"
   },

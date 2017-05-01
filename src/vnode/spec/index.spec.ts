@@ -3,7 +3,6 @@ import {
     Text
 } from 'vnode';
 
-
 describe('Element', () => {
     describe('NativeElement', () => {
         it('lonely element', () => {

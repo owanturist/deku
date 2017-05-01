@@ -8,7 +8,6 @@ import {
     getEventByAttribute
 } from './events';
 
-
 function isValidAttributeValue(value: any): boolean {
     switch (typeof value) {
         case 'string':
@@ -23,7 +22,6 @@ function isValidAttributeValue(value: any): boolean {
         }
     }
 }
-
 
 function isInputWithArea(type: string): boolean {
     switch (type) {
@@ -41,7 +39,6 @@ function isInputWithArea(type: string): boolean {
         }
     }
 }
-
 
 export function set(
     DOMNode: Node | null,

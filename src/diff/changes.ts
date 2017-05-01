@@ -19,7 +19,7 @@ export interface SetAttribute {
     attribute: string;
     nextValue: any;
     prevValue: any;
-};
+}
 
 export const SetAttribute = (
     attribute: string,
@@ -36,7 +36,7 @@ export interface RemoveAttribute {
     type: 'REMOVE_ATTRIBUTE';
     attribute: string;
     value: any;
-};
+}
 
 export const RemoveAttribute = (
     attribute: string,
@@ -52,7 +52,7 @@ export interface InsertChild {
     vnode: Vnode;
     position: number;
     path: string;
-};
+}
 
 export const InsertChild = (
     vnode: Vnode,
@@ -68,21 +68,20 @@ export const InsertChild = (
 export interface RemoveChild {
     type: 'REMOVE_CHILD';
     position: number;
-};
+}
 
 export const RemoveChild = (
     position: number
     ): RemoveChild => ({
     type: 'REMOVE_CHILD',
     position
-})
-
+});
 
 export interface UpdateChild {
     type: 'UPDATE_CHILD';
     position: number;
     changes: Change[];
-};
+}
 
 export const UpdateChild = (
     position: number,
@@ -91,38 +90,38 @@ export const UpdateChild = (
     type: 'UPDATE_CHILD',
     position,
     changes
-})
+});
 
 export interface UpdateChildren {
     type: 'UPDATE_CHILDREN';
     changes: Change[];
-};
+}
 
 export const UpdateChildren = (
     changes: Change[]
     ): UpdateChildren => ({
     type: 'UPDATE_CHILDREN',
     changes
-})
+});
 
 export interface InsertBefore {
     type: 'INSERT_BEFORE';
     position: number;
-};
+}
 
 export const InsertBefore = (
     position: number
     ): InsertBefore => ({
     type: 'INSERT_BEFORE',
     position
-})
+});
 
 export interface ReplaceNode {
     type: 'REPLACE_NODE';
     prevVnode: Vnode;
     nextVnode: Vnode;
     path: string;
-};
+}
 
 export const ReplaceNode = (
     prevVnode: Vnode,
@@ -133,17 +132,16 @@ export const ReplaceNode = (
     prevVnode,
     nextVnode,
     path
-})
+});
 
-
-export type RemoveNode = {
-    type: 'REMOVE_NODE',
-    vnode: Vnode
-};
+export interface RemoveNode {
+    type: 'REMOVE_NODE';
+    vnode: Vnode;
+}
 
 export const RemoveNode = (
     vnode: Vnode
     ): RemoveNode => ({
     type: 'REMOVE_NODE',
     vnode
-})
+});

@@ -27,7 +27,6 @@ import {
     UpdateChild
 } from './changes';
 
-
 export function diffVnodes(
     prevVnode: Vnode,
     nextVnode: Vnode | undefined,
@@ -79,7 +78,6 @@ export function diffVnodes(
     }
 }
 
-
 export function diffAttributes(
     prevVnode: Native,
     nextVnode: Native
@@ -88,7 +86,7 @@ export function diffAttributes(
     const nextAttrs = nextVnode.attributes;
     const changes: Change[] = [];
 
-    for (let name in nextAttrs) {
+    for (const name in nextAttrs) {
         if (nextAttrs[ name ] !== prevAttrs[ name ]) {
             changes.push(
                 SetAttribute(name, nextAttrs[ name ], prevAttrs[ name ])
@@ -96,7 +94,7 @@ export function diffAttributes(
         }
     }
 
-    for (let name in prevAttrs) {
+    for (const name in prevAttrs) {
         if (!nextAttrs.hasOwnProperty(name)) {
             changes.push(
                 RemoveAttribute(name, prevAttrs[ name ])
@@ -106,7 +104,6 @@ export function diffAttributes(
 
     return changes;
 }
-
 
 export function diffChildren(
     prevVnode: Native,
@@ -189,4 +186,3 @@ export function diffChildren(
 
     return UpdateChildren(changes);
 }
-

@@ -10,15 +10,13 @@ import {
     UpdateChildren,
     ReplaceNode,
     RemoveNode,
-    UpdateChild,
-    InsertBefore
+    UpdateChild
 } from '../changes';
 import {
     diffAttributes,
     diffChildren,
     diffVnodes
 } from '..';
-
 
 describe('Diff', () => {
     describe('diffAttributes()', () => {
@@ -208,7 +206,7 @@ describe('Diff', () => {
             const prevVnode = Native('div', {}, []);
             const nextVnode = Native('div', { color: 'red' }, [
                 Native('span', {}, [])
-            ])
+            ]);
 
             expect(
                 diffVnodes(

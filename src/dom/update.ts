@@ -3,14 +3,8 @@ import {
     isNull
 } from 'utils';
 import {
-    diffVnodes
-} from 'diff';
-import {
     Change
 } from 'diff/changes';
-import {
-    Vnode
-} from 'vnode';
 import {
     set as setAttribute,
     remove as removeAttribute
@@ -18,7 +12,6 @@ import {
 import {
     create
 } from './create';
-
 
 export function update(
     DOMNode: Node | null,
@@ -85,7 +78,6 @@ export function update(
     return DOMNode;
 }
 
-
 function updateChildren(
     DOMNode: Node | null,
     changes: Change[],
@@ -106,7 +98,7 @@ function updateChildren(
         return childNodes[ position ];
     }
 
-    for (let change of changes) {
+    for (const change of changes) {
         switch (change.type) {
             case 'INSERT_CHILD': {
                 insertAtPosition(
@@ -128,7 +120,7 @@ function updateChildren(
 
             case 'UPDATE_CHILD': {
                 if (!isNull(DOMNode)) {
-                    for (let subChange of change.changes) {
+                    for (const subChange of change.changes) {
                         update(
                             getChildNode(DOMNode, change.position),
                             subChange

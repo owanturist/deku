@@ -19,5 +19,5 @@ const render = createApp(contaner);
 render(Foo(counter));
 
 setInterval(() => {
-    render(Foo(counter++))
+    render(Foo(counter++));
 }, 1000);

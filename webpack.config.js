@@ -10,7 +10,7 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /\.ts(|x)$/,
+                test: /\.ts$/,
                 loader: 'awesome-typescript',
                 exclude: /node_modules/
             }
@@ -18,6 +18,6 @@ module.exports = {
     },
     resolve: {
         root: path.join(__dirname, 'src'),
-        extensions: ['', '.js', '.ts', '.jsx', '.tsx']
+        extensions: ['', '.js', '.ts']
     }
 };

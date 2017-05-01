@@ -13,8 +13,7 @@ import {
     createDOMElement
 } from './element';
 
-
-type FactoryCache = {
+interface FactoryCache {
     [ tagName: string ]: Element;
 }
 
@@ -34,7 +33,6 @@ function createDOMNodeFactory() {
 
 const DOMNodeFactory = createDOMNodeFactory();
 
-
 function createNative(
     vnode: Native,
     path: string,
@@ -43,7 +41,7 @@ function createNative(
     const DOMNode = DOMNodeFactory(tagName);
     const { length } = children;
 
-    for (let name in attributes) {
+    for (const name in attributes) {
         if (attributes.hasOwnProperty(name)) {
             setAttribute(DOMNode, name, attributes[ name ]);
         }
@@ -64,11 +62,9 @@ function createNative(
     return DOMNode;
 }
 
-
 function createText(text: string): Text {
     return document.createTextNode(text);
 }
-
 
 export function create(
     vnode: Vnode,

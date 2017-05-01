@@ -1,5 +1,7 @@
-export interface Props {};
+// tslint:disable-next-line:no-empty-interface
+export interface Props {}
 
+// tslint:disable-next-line:no-empty-interface
 export interface Attributes extends Props {}
 
 export type Vnode
@@ -30,10 +32,9 @@ export const isSameNative = (
     rightVnode: Native
     ): boolean => leftVnode.tagName === rightVnode.tagName;
 
-
-export type Text = {
-    readonly type: 'TEXT',
-    readonly text: string
+export interface Text {
+    readonly type: 'TEXT';
+    readonly text: string;
 }
 
 export const Text = (text: string): Text => ({
@@ -71,4 +72,4 @@ export const buildKeyPatchings = (vnodes: Vnode[]): KeyPatching[] => {
     }
 
     return result;
-}
+};

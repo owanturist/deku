@@ -4,7 +4,6 @@ import {
     isUndefined
 } from 'utils';
 
-
 describe('isNil()', () => {
     it('undefined', () => {
         expect(isNil(undefined)).toBeTruthy();
