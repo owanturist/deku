@@ -42,6 +42,7 @@ function isInputWithArea(type: string): boolean {
 
 export function set(
     DOMNode: Node | null,
+    tagger: any,
     attribute: string,
     nextValue: any,
     prevValue?: any
@@ -53,10 +54,24 @@ export function set(
     const eventType = getEventByAttribute(attribute);
 
     if (isString(eventType)) {
-        if (isFunction(prevValue)) {
-            DOMNode.removeEventListener(eventType, prevValue);
+        let allHandlers = (DOMNode as any)._dekuHandlers || {};
+        const prevHandler = allHandlers[ eventType ];
+
+        if (typeof nextValue === 'undefined') {
+            DOMNode.removeEventListener(eventType, prevHandler);
+            delete allHandlers[ eventType ];
+        } else if (typeof prevHandler === 'undefined') {
+            const nextHandler = (event) => tagger(nextValue(event));
+            DOMNode.addEventListener(eventType, nextHandler);
+            allHandlers = nextHandler;
+        } else {
+            prevHandler.info = nextValue;
         }
-        DOMNode.addEventListener(eventType, nextValue);
+
+        // if (isFunction(prevValue)) {
+        //     DOMNode.removeEventListener(eventType, prevValue);
+        // }
+        // DOMNode.addEventListener(eventType, nextValue);
         return;
     }
 

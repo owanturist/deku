@@ -15,12 +15,14 @@ import {
 
 export function update(
     DOMNode: Node | null,
+    tagger: any,
     change: Change,
     ): Node | null {
     switch (change.type) {
         case 'SET_ATTRIBUTE': {
             setAttribute(
                 DOMNode,
+                tagger,
                 change.attribute,
                 change.nextValue,
                 change.prevValue
@@ -38,7 +40,7 @@ export function update(
         }
 
         case 'UPDATE_CHILDREN': {
-            updateChildren(DOMNode, change.changes);
+            updateChildren(DOMNode, tagger, change.changes);
             break;
         }
 
@@ -57,6 +59,7 @@ export function update(
             if (!isNull(DOMNode) && !isNull(DOMNode.parentNode)) {
                 const newDOMNode = create(
                     change.nextVnode,
+                    tagger,
                     change.path
                 );
 
@@ -80,6 +83,7 @@ export function update(
 
 function updateChildren(
     DOMNode: Node | null,
+    tagger: any,
     changes: Change[],
     ): void {
     let childNodes: Node[];
@@ -104,7 +108,7 @@ function updateChildren(
                 insertAtPosition(
                     DOMNode,
                     change.position,
-                    create(change.vnode, change.path)
+                    create(change.vnode, tagger, change.path)
                 );
                 break;
             }
@@ -123,6 +127,7 @@ function updateChildren(
                     for (const subChange of change.changes) {
                         update(
                             getChildNode(DOMNode, change.position),
+                            tagger,
                             subChange
                         );
                     }

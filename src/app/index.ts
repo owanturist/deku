@@ -10,39 +10,36 @@ import {
 import {
     Vnode
 } from '../vnode';
-import {
-    isNull
-} from '../utils';
 
-export function create(container: HTMLElement | null, rootId = '0') {
+interface BeginnerProgrammConfig<Msg, Model> {
+    model: Model;
+    view: (model: Model) => Vnode;
+    update: (msg: Msg, model: Model) => Model;
+}
+
+export const beginnerProgram = <Msg, Model>(
+    config: BeginnerProgrammConfig<Msg, Model>,
+    container: HTMLElement
+    ): void => {
+
+    let DOMNode: Node;
     let prevVnode: Vnode;
-    let DOMNode: Node | null = null;
+    let currentModel: Model = config.model;
 
-    function createAppDOM(vnode: Vnode): Node | null {
-        DOMNode = createDOM(vnode, rootId);
-        if (!isNull(container)) {
-            container.appendChild(DOMNode);
-        }
-        prevVnode = vnode;
-
-        return DOMNode;
-    }
-
-    function updateAppDOM(nextVnode: Vnode): Node | null {
-        const changes = diffVnodes(prevVnode, nextVnode, rootId);
+    const tagger = (msg: Msg) => {
+        currentModel = config.update(msg, currentModel);
+        const nextVnode = config.view(currentModel);
+        const changes = diffVnodes(prevVnode, nextVnode, 'root');
 
         for (const change of changes) {
-            DOMNode = updateDOM(DOMNode, change);
+            DOMNode = updateDOM(DOMNode, tagger, change);
         }
 
         prevVnode = nextVnode;
-
-        return DOMNode;
-    }
-
-    return (vnode: Vnode): Node | null => {
-        return isNull(DOMNode) ?
-            createAppDOM(vnode) :
-            updateAppDOM(vnode);
     };
-}
+
+    prevVnode = config.view(config.model);
+    DOMNode = createDOM(prevVnode, tagger, 'root');
+
+    container.appendChild(DOMNode);
+};

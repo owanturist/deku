@@ -1,23 +1,77 @@
 import {
-    createApp,
+    beginnerProgram
+} from './app';
+import {
+    Vnode,
     Native,
     Text
-} from './deku';
+} from './vnode';
 
-const Foo = (counter: number) => (
+type Msg
+    = Increment
+    | Decrement
+    ;
+
+interface Increment {
+    type: 'INCREMENT';
+}
+const Increment = (): Increment => ({
+    type: 'INCREMENT'
+});
+
+interface Decrement {
+    type: 'DECREMENT';
+}
+const Decrement = (): Decrement => ({
+    type: 'DECREMENT'
+});
+
+interface Model {
+    counter: number;
+}
+const Model = (counter: number): Model => ({
+    counter
+});
+
+const view = (model: Model): Vnode => (
     Native('div', { id: 'foo' }, [
         Text('hello world '),
-        Text(counter.toString())
+        Text(model.counter.toString()),
+        Native('div', {}, [
+            Native('button', {
+                onClick: Decrement
+            }, [
+                Text('-')
+            ]),
+            Native('button', {
+                onClick: Increment
+            }, [
+                Text('+')
+            ])
+        ])
     ])
 );
 
-let counter = 0;
+const update = (msg: Msg, model: Model): Model => {
+    switch (msg.type) {
+        case 'INCREMENT': {
+            return {
+                ...model,
+                counter: model.counter + 1
+            };
+        }
 
-const contaner = document.getElementById('app');
-const render = createApp(contaner);
+        case 'DECREMENT': {
+            return {
+                ...model,
+                counter: model.counter - 1
+            };
+        }
+    }
+};
 
-render(Foo(counter));
-
-setInterval(() => {
-    render(Foo(counter++));
-}, 1000);
+beginnerProgram<Msg, Model>({
+    model: Model(0),
+    view,
+    update
+}, document.getElementById('app'));

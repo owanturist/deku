@@ -35,6 +35,7 @@ const DOMNodeFactory = createDOMNodeFactory();
 
 function createNative(
     vnode: Native,
+    tagger: any,
     path: string,
     ): Node {
     const { tagName, attributes, children } = vnode;
@@ -43,7 +44,7 @@ function createNative(
 
     for (const name in attributes) {
         if (attributes.hasOwnProperty(name)) {
-            setAttribute(DOMNode, name, attributes[ name ]);
+            setAttribute(DOMNode, tagger, name, attributes[ name ]);
         }
     }
 
@@ -54,7 +55,7 @@ function createNative(
     for (let index = 0; index < length; index++) {
         const childVnode = children[ index ];
         const childPath = concatPaths(path, index);
-        const childNode = create(childVnode, childPath);
+        const childNode = create(childVnode, tagger, childPath);
 
         DOMNode.appendChild(childNode);
     }
@@ -68,11 +69,12 @@ function createText(text: string): Text {
 
 export function create(
     vnode: Vnode,
+    tagger,
     path: string
     ): Node {
     switch (vnode.type) {
         case 'NATIVE': {
-            return createNative(vnode, path);
+            return createNative(vnode, tagger, path);
         }
 
         case 'TEXT': {
