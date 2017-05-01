@@ -13,6 +13,6 @@
     "moduleResolution": "node"
   },
   "include": [
-    "src/**/*.spec.ts"
+    "src/**/*.test.ts"
   ]
 }

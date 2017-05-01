@@ -10,9 +10,10 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "build": "webpack",
+    "prebuild:test": "npm run clean",
     "build:test": "tsc -p tsconfig.test.json",
     "lint": "tslint \"src/**/**.ts*\"",
-    "pretest": "npm run clean && npm run build:test",
+    "pretest": "npm run build:test",
     "test": "ava"
   },
   "devDependencies": {
@@ -36,11 +37,11 @@
   ],
   "ava": {
     "files": [
-      "dist/**/*.spec.js"
+      "dist/**/*.test.js"
     ],
     "source": [
       "dist/**/*.js",
-      "!dist/**/*.spec.js"
+      "!dist/**/*.test.js"
     ]
   }
 }
