@@ -80,5 +80,9 @@ export function create(
         case 'TEXT': {
             return createText(vnode.text);
         }
+
+        case 'TAGGER': {
+            return create(vnode.vnode, (msg) => tagger(vnode.tagger(msg)), path);
+        }
     }
 }

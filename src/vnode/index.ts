@@ -7,6 +7,7 @@ export interface Attributes extends Props {}
 export type Vnode
     = Native
     | Text
+    | Tagger
     ;
 
 export interface Native {
@@ -43,6 +44,18 @@ export const Text = (text: string): Text => ({
 });
 
 export const isSameText = (leftVnode: Text, rightVnode: Text): boolean => leftVnode.text === rightVnode.text;
+
+export interface Tagger {
+    readonly type: 'TAGGER';
+    readonly tagger: any;
+    readonly vnode: Vnode;
+}
+
+export const Tagger = (tagger: any, vnode: Vnode): Tagger => ({
+    type: 'TAGGER',
+    tagger,
+    vnode
+});
 
 export const concatPaths = (path: string, position: number): string => `${path}.${position}`;
 

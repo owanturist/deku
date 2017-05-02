@@ -7,6 +7,7 @@ import {
     Vnode,
     Native,
     Text,
+    Tagger,
     isSameNative,
     isSameText,
     KeyPatching,
@@ -74,6 +75,10 @@ export function diffVnodes(
             return [
                 SetAttribute('nodeValue', nextVnode.text, (prevVnode as Text).text)
             ];
+        }
+
+        case 'TAGGER': {
+            return diffVnodes((prevVnode as Tagger).vnode, nextVnode.vnode, path);
         }
     }
 }
